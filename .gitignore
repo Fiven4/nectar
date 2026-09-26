@@ -57,3 +57,6 @@ docs/screenshots/.raw/
 android/build/
 android/.gradle/
 android/local.properties
+
+# Firebase CLI cache
+.firebase/
