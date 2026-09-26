@@ -1,0 +1,15 @@
+{
+  "name": "nectar-rules-test",
+  "private": true,
+  "type": "module",
+  "description": "Тесты правил Firestore/Storage на локальном эмуляторе.",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:rules",
+    "test:unit": "node --test validation.test.mjs",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-nectar \"node --test firestore.rules.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "firebase": "^12.0.0"
+  }
+}
