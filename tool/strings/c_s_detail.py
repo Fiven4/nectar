@@ -1,0 +1,18 @@
+STRINGS = {
+    'addedPartial': ('Добавлено {count:int} шт. — это весь доступный остаток', 'Added {count:int} — that is all the available stock'),
+    'addedQuantityToCart': ('«{name}» × {count:int} добавлен в корзину', '“{name}” × {count:int} added to the cart'),
+    'stockLeft': ('Осталось: {count:int} шт', '{count:int} left in stock'),
+    'productDescriptionTitle': ('Описание товара', 'Product description'),
+    'soldOut': ('Распродано', 'Sold out'),
+    'addToCartWithPrice': ('В корзину · {price} ₽', 'Add to cart · {price} ₽'),
+    'factManufacturer': ('Производитель', 'Manufacturer'),
+    'factCountry': ('Страна происхождения', 'Country of origin'),
+    'factBestBefore': ('Срок годности до', 'Best before'),
+    'factComposition': ('Состав', 'Ingredients'),
+    'productFactsTitle': ('Характеристики', 'Details'),
+    'nutritionTitle': ('Пищевая ценность на 100 г', 'Nutrition per 100 g'),
+    'nutritionCalories': ('Ккал', 'Kcal'),
+    'nutritionProteins': ('Белки', 'Protein'),
+    'nutritionFats': ('Жиры', 'Fat'),
+    'nutritionCarbs': ('Углеводы', 'Carbs'),
+}

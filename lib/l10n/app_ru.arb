@@ -1,0 +1,1133 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Nectar",
+  "@appTitle": {},
+  "cancel": "Отмена",
+  "@cancel": {},
+  "save": "Сохранить",
+  "@save": {},
+  "delete": "Удалить",
+  "@delete": {},
+  "retry": "Повторить",
+  "@retry": {},
+  "logout": "Выйти",
+  "@logout": {},
+  "logoutFromAccount": "Выйти из аккаунта",
+  "@logoutFromAccount": {},
+  "apply": "Применить",
+  "@apply": {},
+  "reset": "Сбросить",
+  "@reset": {},
+  "back": "Назад",
+  "@back": {},
+  "add": "Добавить",
+  "@add": {},
+  "genericError": "Произошла ошибка. Попробуйте еще раз.",
+  "@genericError": {},
+  "saveFailed": "Не удалось сохранить. Попробуйте еще раз.",
+  "@saveFailed": {},
+  "loadFailedCheckConnection": "Не удалось загрузить данные. Проверьте соединение.",
+  "@loadFailedCheckConnection": {},
+  "loadFailedTryLater": "Не удалось загрузить данные. Попробуйте позже.",
+  "@loadFailedTryLater": {},
+  "notEnoughStock": "Больше нет в наличии",
+  "@notEnoughStock": {},
+  "language": "Язык",
+  "@language": {},
+  "languageRussian": "Русский",
+  "@languageRussian": {},
+  "languageEnglish": "English",
+  "@languageEnglish": {},
+  "selectLanguage": "Выберите язык",
+  "@selectLanguage": {},
+  "navShop": "Магазин",
+  "@navShop": {},
+  "navCatalog": "Каталог",
+  "@navCatalog": {},
+  "navCart": "Корзина",
+  "@navCart": {},
+  "navProfile": "Профиль",
+  "@navProfile": {},
+  "roleAdmin": "Администратор",
+  "@roleAdmin": {},
+  "roleManager": "Менеджер",
+  "@roleManager": {},
+  "roleCourier": "Курьер",
+  "@roleCourier": {},
+  "roleBuyer": "Покупатель",
+  "@roleBuyer": {},
+  "roleGuest": "Гость",
+  "@roleGuest": {},
+  "valLoginRequired": "Введите логин",
+  "@valLoginRequired": {},
+  "valLoginLength": "Длина логина от 3 до 50 символов",
+  "@valLoginLength": {},
+  "valLoginChars": "Только латиница, цифры и символы ._-",
+  "@valLoginChars": {},
+  "valFieldRequired": "Поле не может быть пустым",
+  "@valFieldRequired": {},
+  "valNameLength": "Длина от 2 до 50 символов",
+  "@valNameLength": {},
+  "valNameChars": "Только буквы, пробелы и дефисы",
+  "@valNameChars": {},
+  "valEmailRequired": "Введите email",
+  "@valEmailRequired": {},
+  "valEmailLength": "Email не должен превышать 100 символов",
+  "@valEmailLength": {},
+  "valEmailFormat": "Неверный формат email",
+  "@valEmailFormat": {},
+  "valPhoneRequired": "Введите номер телефона",
+  "@valPhoneRequired": {},
+  "valPhoneFormat": "Неверный формат номера телефона",
+  "@valPhoneFormat": {},
+  "valPasswordRequired": "Введите пароль",
+  "@valPasswordRequired": {},
+  "valPasswordNoSpaces": "Пароль не должен содержать пробелы",
+  "@valPasswordNoSpaces": {},
+  "valPasswordMaxLength": "Не более 128 символов",
+  "@valPasswordMaxLength": {},
+  "valPasswordMinLength": "Минимум 6 символов",
+  "@valPasswordMinLength": {},
+  "valPasswordDigit": "Пароль должен содержать минимум одну цифру",
+  "@valPasswordDigit": {},
+  "valPasswordConfirmRequired": "Подтвердите пароль",
+  "@valPasswordConfirmRequired": {},
+  "valPasswordMismatch": "Пароли не совпадают",
+  "@valPasswordMismatch": {},
+  "valNamedFieldRequired": "Поле «{fieldName}» обязательно",
+  "@valNamedFieldRequired": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "valNamedFieldMaxLength": "Поле «{fieldName}» не должно превышать {maxLength} символов",
+  "@valNamedFieldMaxLength": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      },
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "valPriceRequired": "Введите цену",
+  "@valPriceRequired": {},
+  "valPricePositive": "Цена должна быть больше 0",
+  "@valPricePositive": {},
+  "valNamedValueRequired": "Введите значение для «{fieldName}»",
+  "@valNamedValueRequired": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "valNamedRange": "Поле «{fieldName}» должно быть в диапазоне {minValue}-{maxValue}",
+  "@valNamedRange": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      },
+      "minValue": {
+        "type": "int"
+      },
+      "maxValue": {
+        "type": "int"
+      }
+    }
+  },
+  "valPromoRequired": "Введите промокод",
+  "@valPromoRequired": {},
+  "valPromoChars": "Только латиница и цифры",
+  "@valPromoChars": {},
+  "valTaxIdRequired": "Введите ИНН",
+  "@valTaxIdRequired": {},
+  "valTaxIdFormat": "ИНН должен содержать 10 или 12 цифр",
+  "@valTaxIdFormat": {},
+  "valCardRequired": "Введите номер карты",
+  "@valCardRequired": {},
+  "valCardLength": "Номер карты должен содержать 16 цифр",
+  "@valCardLength": {},
+  "sortDefault": "По умолчанию",
+  "@sortDefault": {},
+  "sortFreshFirst": "Сначала свежие",
+  "@sortFreshFirst": {},
+  "sortPriceDesc": "По убыванию цены",
+  "@sortPriceDesc": {},
+  "sortPriceAsc": "По возрастанию цены",
+  "@sortPriceAsc": {},
+  "filtersTitle": "Фильтры",
+  "@filtersTitle": {},
+  "filterPrice": "Цена: {from} – {to} ₽",
+  "@filterPrice": {
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "filterBrand": "Бренд",
+  "@filterBrand": {},
+  "filterSort": "Сортировка",
+  "@filterSort": {},
+  "noProductsForFilters": "Нет товаров, подходящих под выбранные фильтры",
+  "@noProductsForFilters": {},
+  "slotAsap": "Как можно скорее (до 60 минут)",
+  "@slotAsap": {},
+  "noDescription": "Детальное описание товара отсутствует.",
+  "@noDescription": {},
+  "currencyRub": "₽",
+  "@currencyRub": {},
+  "unitKg": "кг",
+  "@unitKg": {},
+  "unitG": "г",
+  "@unitG": {},
+  "unitMl": "мл",
+  "@unitMl": {},
+  "unitL": "л",
+  "@unitL": {},
+  "unitPcs": "шт",
+  "@unitPcs": {},
+  "authInvalidEmail": "Некорректный email.",
+  "@authInvalidEmail": {},
+  "authUserDisabled": "Этот аккаунт отключен.",
+  "@authUserDisabled": {},
+  "authWrongCredentials": "Неверный email или пароль.",
+  "@authWrongCredentials": {},
+  "authEmailInUse": "Этот email уже используется.",
+  "@authEmailInUse": {},
+  "authWeakPassword": "Пароль слишком простой.",
+  "@authWeakPassword": {},
+  "authNetworkError": "Не удалось подключиться к сети.",
+  "@authNetworkError": {},
+  "authTooManyRequests": "Слишком много попыток. Попробуйте позже.",
+  "@authTooManyRequests": {},
+  "authAccountDeleted": "Этот аккаунт был удален.",
+  "@authAccountDeleted": {},
+  "authNotSignedIn": "Пользователь не авторизован.",
+  "@authNotSignedIn": {},
+  "authWrongCurrentPassword": "Неверный текущий пароль.",
+  "@authWrongCurrentPassword": {},
+  "errLoginTaken": "Пользователь с таким логином уже существует.",
+  "@errLoginTaken": {},
+  "errLoginNotFound": "Пользователь с таким логином не найден.",
+  "@errLoginNotFound": {},
+  "errAddressEmpty": "Адрес не может быть пустым.",
+  "@errAddressEmpty": {},
+  "errAddressTooLong": "Адрес не должен превышать 300 символов.",
+  "@errAddressTooLong": {},
+  "errCardLength": "Номер карты должен содержать 16 цифр.",
+  "@errCardLength": {},
+  "errPromoInvalid": "Неверный или просроченный промокод.",
+  "@errPromoInvalid": {},
+  "errCartEmpty": "Корзина пуста.",
+  "@errCartEmpty": {},
+  "errDeliveryAddressRequired": "Укажите адрес доставки.",
+  "@errDeliveryAddressRequired": {},
+  "errPaymentMethodRequired": "Выберите способ оплаты.",
+  "@errPaymentMethodRequired": {},
+  "errUserNotFound": "Пользователь не найден.",
+  "@errUserNotFound": {},
+  "errQuantityPositive": "Количество товара должно быть больше нуля.",
+  "@errQuantityPositive": {},
+  "errProductUnavailable": "Товар «{name}» недоступен.",
+  "@errProductUnavailable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errNotEnoughStock": "Недостаточно товара «{name}» на складе.",
+  "@errNotEnoughStock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errOrderNotFound": "Заказ не найден.",
+  "@errOrderNotFound": {},
+  "errUserHasActiveOrders": "Нельзя удалить пользователя с незавершенными заказами.",
+  "@errUserHasActiveOrders": {},
+  "errCategoryNameRequired": "Название категории обязательно.",
+  "@errCategoryNameRequired": {},
+  "errCategoryNameTooLong": "Название категории не должно превышать 100 символов.",
+  "@errCategoryNameTooLong": {},
+  "errCategoryDescriptionTooLong": "Описание категории не должно превышать 500 символов.",
+  "@errCategoryDescriptionTooLong": {},
+  "errCategoryExists": "Категория с таким названием уже существует.",
+  "@errCategoryExists": {},
+  "errCategoryNotFound": "Категория не найдена.",
+  "@errCategoryNotFound": {},
+  "errCategoryHasProducts": "Нельзя удалить категорию, к которой привязаны продукты.",
+  "@errCategoryHasProducts": {},
+  "errManufacturerNameRequired": "Название производителя обязательно.",
+  "@errManufacturerNameRequired": {},
+  "errManufacturerNameTooLong": "Название производителя не должно превышать 100 символов.",
+  "@errManufacturerNameTooLong": {},
+  "errManufacturerExists": "Производитель с таким названием уже существует.",
+  "@errManufacturerExists": {},
+  "errManufacturerNotFound": "Производитель не найден.",
+  "@errManufacturerNotFound": {},
+  "errManufacturerHasProducts": "Нельзя удалить производителя, к которому привязаны продукты.",
+  "@errManufacturerHasProducts": {},
+  "errSupplierNameRequired": "Название поставщика обязательно.",
+  "@errSupplierNameRequired": {},
+  "errSupplierExists": "Поставщик с таким названием уже существует.",
+  "@errSupplierExists": {},
+  "errSupplierNotFound": "Поставщик не найден.",
+  "@errSupplierNotFound": {},
+  "errSupplierHasSupplies": "Нельзя удалить поставщика, если существуют активные поставки продуктов.",
+  "@errSupplierHasSupplies": {},
+  "errRoleNameRequired": "Название роли обязательно.",
+  "@errRoleNameRequired": {},
+  "errRoleNameTooLong": "Название роли не должно превышать 50 символов.",
+  "@errRoleNameTooLong": {},
+  "errRoleExists": "Роль с таким названием уже существует.",
+  "@errRoleExists": {},
+  "errRoleHasUsers": "Нельзя удалить роль, если к ней привязаны пользователи.",
+  "@errRoleHasUsers": {},
+  "errStatusNameRequired": "Название статуса обязательно.",
+  "@errStatusNameRequired": {},
+  "errStatusNameTooLong": "Название статуса не должно превышать 50 символов.",
+  "@errStatusNameTooLong": {},
+  "errStatusExists": "Статус с таким названием уже существует.",
+  "@errStatusExists": {},
+  "errStatusInUse": "Нельзя удалить статус, который используется в заказах.",
+  "@errStatusInUse": {},
+  "errPromoCodeRequired": "Код промокода обязателен.",
+  "@errPromoCodeRequired": {},
+  "errPromoCodeChars": "Промокод должен содержать только латиницу и цифры.",
+  "@errPromoCodeChars": {},
+  "errPromoDiscountRange": "Скидка должна быть в диапазоне от 1 до 99%.",
+  "@errPromoDiscountRange": {},
+  "errPromoExpiryPast": "Срок действия промокода не может быть в прошлом.",
+  "@errPromoExpiryPast": {},
+  "errPromoCodeExists": "Промокод с таким кодом уже существует.",
+  "@errPromoCodeExists": {},
+  "errPromoInActiveOrders": "Нельзя удалить промокод, который применен в незавершенных заказах.",
+  "@errPromoInActiveOrders": {},
+  "errProductNameRequired": "Название продукта обязательно.",
+  "@errProductNameRequired": {},
+  "errProductNameTooLong": "Название продукта не должно превышать 255 символов.",
+  "@errProductNameTooLong": {},
+  "errProductDescriptionTooLong": "Описание продукта не должно превышать 2000 символов.",
+  "@errProductDescriptionTooLong": {},
+  "errProductPricePositive": "Цена продукта должна быть больше 0.",
+  "@errProductPricePositive": {},
+  "errProductStockRange": "Количество на складе должно быть в диапазоне 0-9999.",
+  "@errProductStockRange": {},
+  "errProductNeedsCategory": "Для продукта необходимо выбрать категорию и производителя.",
+  "@errProductNeedsCategory": {},
+  "aboutVersion": "Версия 1.0.0",
+  "@aboutVersion": {},
+  "aboutTerms": "Условия использования",
+  "@aboutTerms": {},
+  "aboutPrivacy": "Политика конфиденциальности",
+  "@aboutPrivacy": {},
+  "aboutLicenses": "Лицензии",
+  "@aboutLicenses": {},
+  "avatarFormatError": "Разрешены только изображения JPEG и PNG.",
+  "@avatarFormatError": {},
+  "avatarTooBig": "Изображение слишком большое: после сжатия не более 150 КБ.",
+  "@avatarTooBig": {},
+  "avatarUpdated": "Аватар успешно обновлен.",
+  "@avatarUpdated": {},
+  "avatarUploadFailed": "Не удалось загрузить изображение.",
+  "@avatarUploadFailed": {},
+  "deleteAccountTitle": "Удалить аккаунт?",
+  "@deleteAccountTitle": {},
+  "deleteAccountBody": "Аккаунт будет удален, если у вас нет незавершенных заказов. Это действие нельзя отменить.",
+  "@deleteAccountBody": {},
+  "deleteAccountRecentLogin": "Для удаления аккаунта нужно войти в систему заново.",
+  "@deleteAccountRecentLogin": {},
+  "deleteAccountFailed": "Не удалось удалить аккаунт.",
+  "@deleteAccountFailed": {},
+  "noEmail": "Нет email",
+  "@noEmail": {},
+  "menuOrders": "Заказы",
+  "@menuOrders": {},
+  "menuMyDetails": "Мои данные",
+  "@menuMyDetails": {},
+  "menuDeliveryAddress": "Адрес доставки",
+  "@menuDeliveryAddress": {},
+  "menuPaymentMethods": "Способы оплаты",
+  "@menuPaymentMethods": {},
+  "menuPromoCodes": "Промокоды",
+  "@menuPromoCodes": {},
+  "menuChangePassword": "Сменить пароль",
+  "@menuChangePassword": {},
+  "menuNotifications": "Уведомления",
+  "@menuNotifications": {},
+  "menuHelp": "Помощь",
+  "@menuHelp": {},
+  "menuAbout": "О приложении",
+  "@menuAbout": {},
+  "deleteAccount": "Удалить аккаунт",
+  "@deleteAccount": {},
+  "addAddressTitle": "Добавить адрес",
+  "@addAddressTitle": {},
+  "addAddressHint": "Введите ваш адрес (улица, дом, кв)",
+  "@addAddressHint": {},
+  "addressRemoveFailed": "Не удалось удалить адрес.",
+  "@addressRemoveFailed": {},
+  "addressesSignIn": "Авторизуйтесь для просмотра адресов",
+  "@addressesSignIn": {},
+  "addressesEmptyTitle": "Нет сохраненных адресов",
+  "@addressesEmptyTitle": {},
+  "addressesEmptyBody": "Добавьте адрес для доставки ваших покупок.",
+  "@addressesEmptyBody": {},
+  "resetSentTitle": "Письмо отправлено!",
+  "@resetSentTitle": {},
+  "resetSentBody": "Мы отправили инструкцию по сбросу пароля на почту\n{email}\n\nЕсли письма нет, проверьте папку «Спам».",
+  "@resetSentBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "gotIt": "Понятно",
+  "@gotIt": {},
+  "resetPasswordTitle": "Сброс пароля",
+  "@resetPasswordTitle": {},
+  "resetPasswordInfo": "Введите email, который вы указывали при регистрации. Мы пришлем ссылку для создания нового пароля.",
+  "@resetPasswordInfo": {},
+  "resetEmailLabel": "Ваш Email",
+  "@resetEmailLabel": {},
+  "resetSendButton": "Отправить письмо",
+  "@resetSendButton": {},
+  "loginPanelAppBar": "Вход в панель",
+  "@loginPanelAppBar": {},
+  "loginPanelTitle": "Вход в web-панель",
+  "@loginPanelTitle": {},
+  "loginTitle": "Вход в Nectar",
+  "@loginTitle": {},
+  "loginPanelSubtitle": "Войдите под ролью администратора или менеджера.",
+  "@loginPanelSubtitle": {},
+  "loginSubtitle": "Войдите под логином или email, чтобы работать с заказами и покупками.",
+  "@loginSubtitle": {},
+  "loginIdentifierLabel": "Логин или email",
+  "@loginIdentifierLabel": {},
+  "loginIdentifierRequired": "Введите логин или email",
+  "@loginIdentifierRequired": {},
+  "loginIdentifierInvalid": "Логин или email указан некорректно",
+  "@loginIdentifierInvalid": {},
+  "loginIdentifierHint": "Например, ivan_01 или user@mail.com",
+  "@loginIdentifierHint": {},
+  "labelPassword": "Пароль",
+  "@labelPassword": {},
+  "passwordHint": "Введите пароль",
+  "@passwordHint": {},
+  "forgotPasswordLink": "Забыли пароль?",
+  "@forgotPasswordLink": {},
+  "signInToPanel": "Войти в панель",
+  "@signInToPanel": {},
+  "signIn": "Войти",
+  "@signIn": {},
+  "continueWithGoogle": "Продолжить с Google",
+  "@continueWithGoogle": {},
+  "noAccount": "Нет аккаунта?",
+  "@noAccount": {},
+  "registerAction": "Зарегистрироваться",
+  "@registerAction": {},
+  "panelInfoNote": "Покупатели и курьеры работают через мобильное приложение. Web-панель предназначена только для ролей «Администратор» и «Менеджер».",
+  "@panelInfoNote": {},
+  "registerTitle": "Регистрация",
+  "@registerTitle": {},
+  "registerHeading": "Новый аккаунт покупателя",
+  "@registerHeading": {},
+  "registerRoleNote": "После регистрации вам автоматически будет назначена роль «Покупатель».",
+  "@registerRoleNote": {},
+  "labelLogin": "Логин",
+  "@labelLogin": {},
+  "registerLoginHint": "Например, ivan_venikov",
+  "@registerLoginHint": {},
+  "labelName": "Имя",
+  "@labelName": {},
+  "registerNameHint": "Ваше имя",
+  "@registerNameHint": {},
+  "labelPhone": "Телефон",
+  "@labelPhone": {},
+  "labelEmail": "Email",
+  "@labelEmail": {},
+  "registerPasswordHint": "Минимум 6 символов и одна цифра",
+  "@registerPasswordHint": {},
+  "labelPasswordConfirm": "Подтверждение пароля",
+  "@labelPasswordConfirm": {},
+  "registerPasswordRepeatHint": "Повторите пароль",
+  "@registerPasswordRepeatHint": {},
+  "haveAccountSignIn": "Уже есть аккаунт? Войти",
+  "@haveAccountSignIn": {},
+  "profileLoadFailed": "Не удалось загрузить профиль. Проверьте соединение.",
+  "@profileLoadFailed": {},
+  "roleBlockedTitle": "Роль «{roleName}» не может работать в мобильном приложении.",
+  "@roleBlockedTitle": {
+    "placeholders": {
+      "roleName": {
+        "type": "String"
+      }
+    }
+  },
+  "roleBlockedBody": "Пожалуйста, используйте веб-версию (сайт) для администрирования.",
+  "@roleBlockedBody": {},
+  "checkoutSignInRequired": "Необходимо войти в систему.",
+  "@checkoutSignInRequired": {},
+  "checkoutSelectAddress": "Выберите адрес доставки.",
+  "@checkoutSelectAddress": {},
+  "checkoutSelectCard": "Для онлайн-оплаты выберите сохраненную карту.",
+  "@checkoutSelectCard": {},
+  "checkoutFailed": "Не удалось оформить заказ.",
+  "@checkoutFailed": {},
+  "checkoutTitle": "Оформление заказа",
+  "@checkoutTitle": {},
+  "addAddressInProfile": "Добавьте адрес в профиле",
+  "@addAddressInProfile": {},
+  "paymentMethodTitle": "Способ оплаты",
+  "@paymentMethodTitle": {},
+  "cardLabel": "Карта",
+  "@cardLabel": {},
+  "addCardInProfile": "Добавьте карту в профиле",
+  "@addCardInProfile": {},
+  "promoCodeLabel": "Промокод",
+  "@promoCodeLabel": {},
+  "promoNotSelected": "Не выбран",
+  "@promoNotSelected": {},
+  "choose": "Выбрать",
+  "@choose": {},
+  "summaryItemsTotal": "Сумма товаров",
+  "@summaryItemsTotal": {},
+  "placeOrder": "Разместить заказ",
+  "@placeOrder": {},
+  "orderSuccessTitle": "Заказ успешно оформлен!",
+  "@orderSuccessTitle": {},
+  "orderSuccessBody": "Номер заказа: {number}\nИстория заказа и дальнейшие уведомления будут доступны в профиле.",
+  "@orderSuccessBody": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "backToShop": "Вернуться в магазин",
+  "@backToShop": {},
+  "courierUpdateFailed": "Не удалось обновить заказ. Попробуйте еще раз.",
+  "@courierUpdateFailed": {},
+  "courierNotSignedIn": "Курьер не авторизован.",
+  "@courierNotSignedIn": {},
+  "courierTitle": "Доставка",
+  "@courierTitle": {},
+  "courierNoOrders": "У вас пока нет назначенных заказов.",
+  "@courierNoOrders": {},
+  "courierOrderDefault": "Заказ",
+  "@courierOrderDefault": {},
+  "courierAddressMissing": "Адрес не указан",
+  "@courierAddressMissing": {},
+  "courierSlot": "Время: {slot}",
+  "@courierSlot": {
+    "placeholders": {
+      "slot": {
+        "type": "String"
+      }
+    }
+  },
+  "courierCustomer": "Клиент: {name}{phone}",
+  "@courierCustomer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "courierCashDue": "К оплате наличными: {amount}",
+  "@courierCashDue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "courierStatus": "Статус: {status}",
+  "@courierStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "courierStart": "Начать доставку",
+  "@courierStart": {},
+  "courierComplete": "Подтвердить доставку",
+  "@courierComplete": {},
+  "courierActiveTitle": "Активные заказы",
+  "@courierActiveTitle": {},
+  "courierHistoryTitle": "История доставок",
+  "@courierHistoryTitle": {},
+  "courierNoActive": "Активных заказов нет. Новые назначения появятся здесь.",
+  "@courierNoActive": {},
+  "courierConfirmTitle": "Подтвердить доставку?",
+  "@courierConfirmTitle": {},
+  "courierConfirmBody": "Заказ {number} будет отмечен как доставленный. Отменить это действие нельзя.",
+  "@courierConfirmBody": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "courierCancelledNote": "Заказ отменен, доставка не нужна.",
+  "@courierCancelledNote": {},
+  "courierPayment": "Оплата: {method}",
+  "@courierPayment": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "courierTotal": "Сумма заказа: {amount}",
+  "@courierTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "courierPhoneCopied": "Телефон скопирован",
+  "@courierPhoneCopied": {},
+  "courierItemsTitle": "Состав заказа",
+  "@courierItemsTitle": {},
+  "detailsSaved": "Данные успешно сохранены",
+  "@detailsSaved": {},
+  "detailsSaveFailed": "Не удалось сохранить данные. Попробуйте еще раз.",
+  "@detailsSaveFailed": {},
+  "fullName": "Полное имя",
+  "@fullName": {},
+  "phoneNumber": "Номер телефона",
+  "@phoneNumber": {},
+  "emailReadOnly": "Email (нельзя изменить)",
+  "@emailReadOnly": {},
+  "faqTitle": "Часто задаваемые вопросы",
+  "@faqTitle": {},
+  "faqTrackQ": "Как отследить мой заказ?",
+  "@faqTrackQ": {},
+  "faqTrackA": "Вы можете отследить свой заказ в разделе «Заказы» вашего профиля.",
+  "@faqTrackA": {},
+  "faqReturnQ": "Как вернуть товар?",
+  "@faqReturnQ": {},
+  "faqReturnA": "Возврат можно оформить в течение 7 дней после доставки, связавшись с нашей поддержкой.",
+  "@faqReturnA": {},
+  "faqPaymentQ": "Какие способы оплаты принимаются?",
+  "@faqPaymentQ": {},
+  "faqPaymentA": "Мы принимаем банковские карты, Apple Pay и оплату наличными курьеру.",
+  "@faqPaymentA": {},
+  "faqPromoQ": "Как использовать промокоды?",
+  "@faqPromoQ": {},
+  "faqPromoA": "Введите промокод на экране корзины или в разделе «Промокоды».",
+  "@faqPromoA": {},
+  "categoryOther": "Другое",
+  "@categoryOther": {},
+  "shareMessage": "🍏 Смотри, что я нашел в Nectar!\n\n✨ {name} — всего за {price} ₽.\n\nЗаказывай прямо сейчас:\n🔗 {link}",
+  "@shareMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentOnline": "Онлайн",
+  "@paymentOnline": {},
+  "paymentCash": "Наличными",
+  "@paymentCash": {},
+  "userDefaultName": "Пользователь",
+  "@userDefaultName": {},
+  "notificationsSignIn": "Авторизуйтесь для просмотра уведомлений",
+  "@notificationsSignIn": {},
+  "notificationsCleared": "Все уведомления очищены.",
+  "@notificationsCleared": {},
+  "notificationsClearFailed": "Не удалось очистить уведомления.",
+  "@notificationsClearFailed": {},
+  "clearAll": "Очистить все",
+  "@clearAll": {},
+  "notifPushTitle": "Push-уведомления",
+  "@notifPushTitle": {},
+  "notifPushSubtitle": "Получать внутрисистемные уведомления по заказам",
+  "@notifPushSubtitle": {},
+  "notifSmsTitle": "SMS-уведомления",
+  "@notifSmsTitle": {},
+  "notifSmsSubtitle": "Получать сообщения о доставке",
+  "@notifSmsSubtitle": {},
+  "notifEmailTitle": "Email-уведомления",
+  "@notifEmailTitle": {},
+  "notifEmailSubtitle": "Получать акции и напоминания по почте",
+  "@notifEmailSubtitle": {},
+  "notifHistoryTitle": "История уведомлений",
+  "@notifHistoryTitle": {},
+  "notifEmpty": "Пока нет уведомлений. Они будут появляться автоматически при изменении статуса заказа.",
+  "@notifEmpty": {},
+  "notifDefaultText": "Уведомление",
+  "@notifDefaultText": {},
+  "onboardingSkip": "Пропустить",
+  "@onboardingSkip": {},
+  "onboardingNext": "Далее",
+  "@onboardingNext": {},
+  "onboardingStart": "Начать",
+  "@onboardingStart": {},
+  "onboarding1Title": "Гарантия свежести",
+  "@onboarding1Title": {},
+  "onboarding1Body": "Мы тщательно отбираем овощи, фрукты, мясо и молочные продукты для вашего стола.",
+  "@onboarding1Body": {},
+  "onboarding2Title": "Доставка за час",
+  "@onboarding2Title": {},
+  "onboarding2Body": "Курьер привезет заказ в удобное для вас время, а статус можно отслеживать в приложении.",
+  "@onboarding2Body": {},
+  "onboarding3Title": "Выгодные покупки",
+  "@onboarding3Title": {},
+  "onboarding3Body": "Собирайте избранное, применяйте промокоды и оформляйте заказ в пару касаний.",
+  "@onboarding3Body": {},
+  "myOrders": "Мои заказы",
+  "@myOrders": {},
+  "ordersSignInRequired": "Авторизуйтесь для просмотра заказов",
+  "@ordersSignInRequired": {},
+  "ordersLoadFailed": "Не удалось загрузить заказы. Попробуйте позже.",
+  "@ordersLoadFailed": {},
+  "ordersEmptyTitle": "Пока нет заказов",
+  "@ordersEmptyTitle": {},
+  "ordersEmptyBody": "Когда вы сделаете заказ, он появится здесь.",
+  "@ordersEmptyBody": {},
+  "startShopping": "За покупками",
+  "@startShopping": {},
+  "orderNumberFallback": "Заказ #{id}",
+  "@orderNumberFallback": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "orderCancelled": "Заказ отменен",
+  "@orderCancelled": {},
+  "stepCreated": "Создан",
+  "@stepCreated": {},
+  "stepWithCourier": "У курьера",
+  "@stepWithCourier": {},
+  "stepDelivered": "Доставлен",
+  "@stepDelivered": {},
+  "labelAddress": "Адрес",
+  "@labelAddress": {},
+  "notSpecified": "Не указан",
+  "@notSpecified": {},
+  "deliveryTime": "Время доставки",
+  "@deliveryTime": {},
+  "orderInfoPayment": "Оплата",
+  "@orderInfoPayment": {},
+  "notSpecifiedFem": "Не указана",
+  "@notSpecifiedFem": {},
+  "orderInfoCourier": "Курьер",
+  "@orderInfoCourier": {},
+  "orderInfoCourierPhone": "Телефон курьера",
+  "@orderInfoCourierPhone": {},
+  "total": "Итого",
+  "@total": {},
+  "itemDefaultName": "Товар",
+  "@itemDefaultName": {},
+  "quantityLabel": "Количество: {quantity}",
+  "@quantityLabel": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "hideOrderFailed": "Не удалось скрыть заказ.",
+  "@hideOrderFailed": {},
+  "hideOrder": "Скрыть из списка",
+  "@hideOrder": {},
+  "orderConfirmedWaiting": "Вы подтвердили получение. Ожидаем менеджера.",
+  "@orderConfirmedWaiting": {},
+  "orderConfirmedToast": "Вы подтвердили, что всё хорошо!",
+  "@orderConfirmedToast": {},
+  "orderConfirmFailed": "Не удалось подтвердить получение.",
+  "@orderConfirmFailed": {},
+  "orderConfirmButton": "Подтвердить, что всё хорошо",
+  "@orderConfirmButton": {},
+  "passwordChanged": "Пароль успешно изменен.",
+  "@passwordChanged": {},
+  "changePasswordTitle": "Смена пароля",
+  "@changePasswordTitle": {},
+  "currentPasswordRequired": "Введите текущий пароль",
+  "@currentPasswordRequired": {},
+  "currentPasswordLabel": "Текущий пароль",
+  "@currentPasswordLabel": {},
+  "newPasswordSame": "Новый пароль совпадает с текущим",
+  "@newPasswordSame": {},
+  "newPasswordLabel": "Новый пароль",
+  "@newPasswordLabel": {},
+  "newPasswordRepeatLabel": "Повторите новый пароль",
+  "@newPasswordRepeatLabel": {},
+  "addCardTitle": "Добавить карту",
+  "@addCardTitle": {},
+  "addCardHint": "Номер карты (16 цифр)",
+  "@addCardHint": {},
+  "cardRemoveFailed": "Не удалось удалить карту.",
+  "@cardRemoveFailed": {},
+  "cardsSignIn": "Авторизуйтесь для просмотра карт",
+  "@cardsSignIn": {},
+  "cardsEmptyTitle": "Нет привязанных карт",
+  "@cardsEmptyTitle": {},
+  "cardsEmptyBody": "Добавьте банковскую карту для оплаты.",
+  "@cardsEmptyBody": {},
+  "promoApplied": "Промокод {code} применен. Скидка {percent}%.",
+  "@promoApplied": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "promoCheckFailed": "Не удалось проверить промокод. Попробуйте позже.",
+  "@promoCheckFailed": {},
+  "promoRemoved": "Промокод удален.",
+  "@promoRemoved": {},
+  "promoCurrentlyApplied": "Сейчас применен промокод {code} со скидкой {percent}%.",
+  "@promoCurrentlyApplied": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "promoAvailableTitle": "Доступные промокоды",
+  "@promoAvailableTitle": {},
+  "promoNoneActive": "Активных промокодов пока нет.",
+  "@promoNoneActive": {},
+  "promoDiscountUntil": "Скидка {percent}% до {date}",
+  "@promoDiscountUntil": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cartTitle": "Моя корзина",
+  "@cartTitle": {},
+  "cartEmpty": "Ваша корзина пуста",
+  "@cartEmpty": {},
+  "cartPromoApplied": "Применен промокод {code} со скидкой {percent}%. Экономия: {savings}",
+  "@cartPromoApplied": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "savings": {
+        "type": "String"
+      }
+    }
+  },
+  "summarySubtotal": "Подытог",
+  "@summarySubtotal": {},
+  "summaryDiscount": "Скидка",
+  "@summaryDiscount": {},
+  "summaryDelivery": "Доставка",
+  "@summaryDelivery": {},
+  "free": "Бесплатно",
+  "@free": {},
+  "deliveryFeeWithThreshold": "{fee} (бесплатно от {threshold} ₽)",
+  "@deliveryFeeWithThreshold": {
+    "placeholders": {
+      "fee": {
+        "type": "String"
+      },
+      "threshold": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout": "Оформить заказ",
+  "@checkout": {},
+  "productsLoadFailedLater": "Не удалось загрузить товары. Попробуйте позже.",
+  "@productsLoadFailedLater": {},
+  "categoryEmpty": "В этой категории пока нет товаров",
+  "@categoryEmpty": {},
+  "addedPartial": "Добавлено {count} шт. — это весь доступный остаток",
+  "@addedPartial": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addedQuantityToCart": "«{name}» × {count} добавлен в корзину",
+  "@addedQuantityToCart": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stockLeft": "Осталось: {count} шт",
+  "@stockLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "productDescriptionTitle": "Описание товара",
+  "@productDescriptionTitle": {},
+  "soldOut": "Распродано",
+  "@soldOut": {},
+  "addToCartWithPrice": "В корзину · {price} ₽",
+  "@addToCartWithPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "factManufacturer": "Производитель",
+  "@factManufacturer": {},
+  "factCountry": "Страна происхождения",
+  "@factCountry": {},
+  "factBestBefore": "Срок годности до",
+  "@factBestBefore": {},
+  "factComposition": "Состав",
+  "@factComposition": {},
+  "productFactsTitle": "Характеристики",
+  "@productFactsTitle": {},
+  "nutritionTitle": "Пищевая ценность на 100 г",
+  "@nutritionTitle": {},
+  "nutritionCalories": "Ккал",
+  "@nutritionCalories": {},
+  "nutritionProteins": "Белки",
+  "@nutritionProteins": {},
+  "nutritionFats": "Жиры",
+  "@nutritionFats": {},
+  "nutritionCarbs": "Углеводы",
+  "@nutritionCarbs": {},
+  "categoriesLoadFailed": "Не удалось загрузить категории.",
+  "@categoriesLoadFailed": {},
+  "categoriesEmpty": "Категории пока не добавлены.",
+  "@categoriesEmpty": {},
+  "searchFailed": "Не удалось выполнить поиск. Проверьте соединение.",
+  "@searchFailed": {},
+  "favoritesNothingToAdd": "Нет товаров в наличии для добавления",
+  "@favoritesNothingToAdd": {},
+  "favoritesAdded": "Товары добавлены в корзину ({count})",
+  "@favoritesAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoritesTitle": "Избранное",
+  "@favoritesTitle": {},
+  "favoritesLoadFailed": "Не удалось загрузить избранное.",
+  "@favoritesLoadFailed": {},
+  "favoritesEmpty": "У вас пока нет любимых товаров ❤️",
+  "@favoritesEmpty": {},
+  "addAllToCart": "В корзину всё",
+  "@addAllToCart": {},
+  "shopLocation": "Москва, Россия",
+  "@shopLocation": {},
+  "searchHint": "Поиск по магазину",
+  "@searchHint": {},
+  "productsLoadFailedConnection": "Не удалось загрузить товары. Проверьте соединение.",
+  "@productsLoadFailedConnection": {},
+  "noProductsInDatabase": "Товары отсутствуют в базе данных.",
+  "@noProductsInDatabase": {},
+  "nothingFound": "По вашему запросу ничего не найдено",
+  "@nothingFound": {},
+  "promoBannerTitle": "Скидка 20% на первый заказ",
+  "@promoBannerTitle": {},
+  "promoBannerCode": "Промокод NECTAR20",
+  "@promoBannerCode": {},
+  "popular": "Популярное",
+  "@popular": {},
+  "seeAll": "Все",
+  "@seeAll": {},
+  "splashBrand": "нектар",
+  "@splashBrand": {},
+  "splashTagline": "онлайн магазин",
+  "@splashTagline": {},
+  "statusNew": "Новый",
+  "@statusNew": {},
+  "statusProcessing": "В сборке",
+  "@statusProcessing": {},
+  "statusAssigned": "Передан курьеру",
+  "@statusAssigned": {},
+  "statusDelivering": "В пути",
+  "@statusDelivering": {},
+  "statusDelivered": "Доставлен",
+  "@statusDelivered": {},
+  "statusCancelled": "Отменен",
+  "@statusCancelled": {},
+  "addedToCart": "«{name}» добавлен в корзину",
+  "@addedToCart": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noMoreStockNamed": "Больше нет в наличии: {name}",
+  "@noMoreStockNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "outOfStock": "Нет в наличии",
+  "@outOfStock": {},
+  "reseedTitle": "Перезалить базу товаров?",
+  "@reseedTitle": {},
+  "reseedBody": "Все текущие товары будут удалены и заменены стартовым каталогом (69 товаров, 9 категорий). Это действие нельзя отменить.",
+  "@reseedBody": {},
+  "reseedConfirm": "Перезалить",
+  "@reseedConfirm": {},
+  "reseedLoading": "Загружаем товары...",
+  "@reseedLoading": {},
+  "reseedDone": "База товаров успешно обновлена!",
+  "@reseedDone": {},
+  "reseedFailed": "Не удалось обновить базу товаров.",
+  "@reseedFailed": {},
+  "adminHome": "Главная",
+  "@adminHome": {},
+  "sectionInDevelopment": "Раздел в разработке",
+  "@sectionInDevelopment": {},
+  "adminDashboardTitle": "Панель управления",
+  "@adminDashboardTitle": {},
+  "adminNewOrders": "Новые заказы",
+  "@adminNewOrders": {},
+  "adminActive": "Активные",
+  "@adminActive": {},
+  "adminProducts": "Товары",
+  "@adminProducts": {},
+  "adminInCatalog": "В каталоге",
+  "@adminInCatalog": {},
+  "adminQuickActions": "Быстрые действия",
+  "@adminQuickActions": {},
+  "adminReseedButton": "Перезалить базу товаров (Сброс)",
+  "@adminReseedButton": {},
+  "adminReseedHint": "Загружает стартовый каталог с фотографиями, описанием, составом и пищевой ценностью.",
+  "@adminReseedHint": {},
+  "adminOrdersTitle": "Управление заказами",
+  "@adminOrdersTitle": {},
+  "adminNoOrders": "Нет заказов",
+  "@adminNoOrders": {},
+  "adminNoName": "Без имени",
+  "@adminNoName": {},
+  "adminCourierRequired": "Ошибка: нельзя перевести заказ в статус «В пути» или «Доставлен», пока не назначен курьер!",
+  "@adminCourierRequired": {},
+  "adminOrderUpdated": "Заказ успешно обновлен!",
+  "@adminOrderUpdated": {},
+  "adminOrderUpdateFailed": "Не удалось обновить заказ.",
+  "@adminOrderUpdateFailed": {},
+  "adminCustomer": "Клиент: {name}",
+  "@adminCustomer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminAddress": "Адрес: {address}",
+  "@adminAddress": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPhone": "Телефон: {phone}",
+  "@adminPhone": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDeliverySlot": "Время доставки: {slot}",
+  "@adminDeliverySlot": {
+    "placeholders": {
+      "slot": {
+        "type": "String"
+      }
+    }
+  },
+  "adminAmount": "Сумма: ₽{amount}",
+  "@adminAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "adminCourierLabel": "Курьер:",
+  "@adminCourierLabel": {},
+  "notAssigned": "Не назначен",
+  "@notAssigned": {},
+  "adminStatusLabel": "Статус:",
+  "@adminStatusLabel": {},
+  "webBlockedTitle": "Для оформления заказов скачайте наше приложение",
+  "@webBlockedTitle": {},
+  "webBlockedBody": "Вы вошли как «{roleName}». Данный веб-сайт предназначен только для управления магазином (для администраторов).\n\nПожалуйста, установите Nectar на свой телефон, чтобы совершать покупки.",
+  "@webBlockedBody": {
+    "placeholders": {
+      "roleName": {
+        "type": "String"
+      }
+    }
+  },
+  "landingForCustomers": "Покупателям",
+  "@landingForCustomers": {},
+  "landingAbout": "О компании",
+  "@landingAbout": {},
+  "landingStaffLogin": "Вход для сотрудников",
+  "@landingStaffLogin": {},
+  "landingBadge": "🚀 Доставка за 60 минут",
+  "@landingBadge": {},
+  "landingHeadline": "Свежие продукты\nс доставкой на дом",
+  "@landingHeadline": {},
+  "landingBody": "Заказывайте любимые овощи, фрукты, мясо и молочные продукты. Мы тщательно отбираем товары и доставляем их прямо к вашей двери.",
+  "@landingBody": {},
+  "landingDownload": "Скачайте наше приложение:",
+  "@landingDownload": {},
+  "landingFreshOnly": "Только\nсвежее",
+  "@landingFreshOnly": {},
+  "landingDownloadIn": "Скачать в",
+  "@landingDownloadIn": {}
+}

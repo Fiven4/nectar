@@ -1,0 +1,15 @@
+STRINGS = {
+    'registerTitle': ('Регистрация', 'Sign up'),
+    'registerHeading': ('Новый аккаунт покупателя', 'New customer account'),
+    'registerRoleNote': ('После регистрации вам автоматически будет назначена роль «Покупатель».', 'After signing up you will automatically get the “Customer” role.'),
+    'labelLogin': ('Логин', 'Login'),
+    'registerLoginHint': ('Например, ivan_venikov', 'For example, ivan_venikov'),
+    'labelName': ('Имя', 'Name'),
+    'registerNameHint': ('Ваше имя', 'Your name'),
+    'labelPhone': ('Телефон', 'Phone'),
+    'labelEmail': ('Email', 'Email'),
+    'registerPasswordHint': ('Минимум 6 символов и одна цифра', 'At least 6 characters and one digit'),
+    'labelPasswordConfirm': ('Подтверждение пароля', 'Confirm password'),
+    'registerPasswordRepeatHint': ('Повторите пароль', 'Repeat the password'),
+    'haveAccountSignIn': ('Уже есть аккаунт? Войти', 'Already have an account? Sign in'),
+}

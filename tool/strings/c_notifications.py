@@ -1,0 +1,15 @@
+STRINGS = {
+    'notificationsSignIn': ('Авторизуйтесь для просмотра уведомлений', 'Sign in to view notifications'),
+    'notificationsCleared': ('Все уведомления очищены.', 'All notifications cleared.'),
+    'notificationsClearFailed': ('Не удалось очистить уведомления.', 'Could not clear notifications.'),
+    'clearAll': ('Очистить все', 'Clear all'),
+    'notifPushTitle': ('Push-уведомления', 'Push notifications'),
+    'notifPushSubtitle': ('Получать внутрисистемные уведомления по заказам', 'Receive in-app order notifications'),
+    'notifSmsTitle': ('SMS-уведомления', 'SMS notifications'),
+    'notifSmsSubtitle': ('Получать сообщения о доставке', 'Receive delivery messages'),
+    'notifEmailTitle': ('Email-уведомления', 'Email notifications'),
+    'notifEmailSubtitle': ('Получать акции и напоминания по почте', 'Receive offers and reminders by email'),
+    'notifHistoryTitle': ('История уведомлений', 'Notification history'),
+    'notifEmpty': ('Пока нет уведомлений. Они будут появляться автоматически при изменении статуса заказа.', 'No notifications yet. They will appear automatically when an order status changes.'),
+    'notifDefaultText': ('Уведомление', 'Notification'),
+}
