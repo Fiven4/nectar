@@ -1,0 +1,238 @@
+rules_version = '2';
+
+// Роли хранятся в users/{uid}.role: admin, manager, courier, buyer (customer = buyer).
+// Правила проверены тестами на эмуляторе: tool/rules-test (npm test).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasProfile() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function role() {
+      return hasProfile() ? ownProfile().get('role', 'guest') : 'guest';
+    }
+
+    function isActive() {
+      return hasProfile() && ownProfile().get('isDeleted', false) != true;
+    }
+
+    function isAdmin() {
+      return isActive() && role() == 'admin';
+    }
+
+    function isStaff() {
+      return isActive() && role() in ['admin', 'manager'];
+    }
+
+    function isBuyer() {
+      return isActive() && role() in ['buyer', 'customer'];
+    }
+
+    function isCourier() {
+      return isActive() && role() == 'courier';
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // Флаг isDeleted владелец меняет только при самоудалении аккаунта (deletedBy = он сам)
+    // и при откате самоудаления. Заблокированный администратором пользователь
+    // (deletedBy = uid администратора) снять блокировку и менять профиль не может.
+    function deletedFlagChangeAllowed() {
+      let before = resource.data.get('isDeleted', false);
+      let after = request.resource.data.get('isDeleted', false);
+      return (before == false && after == false)
+        || (before == false && after == true
+            && request.resource.data.get('deletedBy', '') == request.auth.uid)
+        || (before == true && after == false
+            && resource.data.get('deletedBy', '') == request.auth.uid);
+    }
+
+    function validProduct(data) {
+      return data.get('name', 'x') is string
+        && data.get('name', 'x').size() > 0
+        && data.get('name', 'x').size() <= 255
+        && data.get('price', 1) is number
+        && data.get('price', 1) > 0
+        && data.get('stockQuantity', 0) is number
+        && data.get('stockQuantity', 0) >= 0;
+    }
+
+    function validPromo(data) {
+      return data.get('discountPercent', 1) is number
+        && data.get('discountPercent', 1) >= 1
+        && data.get('discountPercent', 1) <= 99;
+    }
+
+    // Скидка в заказе обязана совпадать с промокодом, на который заказ ссылается.
+    function validOrderDiscount(data) {
+      let promoId = data.get('promoCodeId', null);
+      return promoId == null
+        ? data.get('discountPercent', 0) == 0
+        : (promoId is string
+            && exists(/databases/$(database)/documents/promoCodes/$(promoId))
+            && get(/databases/$(database)/documents/promoCodes/$(promoId)).data.discountPercent
+                == data.get('discountPercent', 0));
+    }
+
+    // ---------- Пользователи ----------
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isStaff());
+      // Самостоятельная регистрация: только роль покупателя и только свой документ.
+      allow create: if isAdmin() || (
+        signedIn() && request.auth.uid == userId &&
+        request.resource.data.role in ['buyer', 'customer'] &&
+        request.resource.data.get('isDeleted', false) == false
+      );
+      // Владелец меняет профиль, но не роль; роли и блокировки меняет только администратор.
+      allow update: if isAdmin() || (
+        signedIn() && request.auth.uid == userId &&
+        request.resource.data.get('role', 'buyer') == resource.data.get('role', 'buyer') &&
+        request.resource.data.get('uid', userId) == resource.data.get('uid', userId) &&
+        // Аватар хранится в профиле как base64 (Firebase Storage платный).
+        request.resource.data.get('photoData', '').size() <= 210000 &&
+        deletedFlagChangeAllowed()
+      );
+      allow delete: if false;
+    }
+
+    // Публичный индекс «логин -> email» для входа по логину.
+    match /loginIndex/{login} {
+      allow get: if true;
+      allow list: if false;
+      // Запись создается только для себя и только со своей почтой из токена.
+      allow create: if isAdmin() || (
+        signedIn() && request.resource.data.uid == request.auth.uid &&
+        request.resource.data.keys().hasOnly(['uid', 'email']) &&
+        request.resource.data.email is string &&
+        request.resource.data.email.lower() == request.auth.token.get('email', '').lower()
+      );
+      allow update: if isAdmin();
+      // Владелец освобождает свой логин при удалении аккаунта.
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // ---------- Каталог ----------
+    match /products/{productId} {
+      allow read: if signedIn();
+      allow create: if isStaff() && validProduct(request.resource.data);
+      allow update: if (isStaff() && validProduct(request.resource.data)) || (
+        // Покупатель при оформлении заказа может только уменьшить остаток
+        // (не больше 99 единиц за одну запись, как в корзине).
+        isBuyer() &&
+        changedKeys().hasOnly(['stockQuantity', 'updatedAt']) &&
+        request.resource.data.stockQuantity >= 0 &&
+        request.resource.data.stockQuantity < resource.data.stockQuantity &&
+        resource.data.stockQuantity - request.resource.data.stockQuantity <= 99
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /categories/{docId} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+
+    match /manufacturers/{docId} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+
+    // Поставщики: менеджер только просматривает, изменяет администратор.
+    match /suppliers/{docId} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+
+    match /roles/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /orderStatuses/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /promoCodes/{docId} {
+      allow read: if signedIn();
+      allow create: if isStaff() && validPromo(request.resource.data);
+      allow delete: if isStaff();
+      allow update: if (isStaff() && validPromo(request.resource.data)) || (
+        // Покупатель при оформлении заказа только увеличивает счетчик использований.
+        isBuyer() &&
+        changedKeys().hasOnly(['usageCount', 'updatedAt']) &&
+        request.resource.data.usageCount == resource.data.get('usageCount', 0) + 1
+      );
+    }
+
+    // ---------- Заказы ----------
+    match /orders/{orderId} {
+      allow read: if signedIn() && (
+        isStaff() ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.courierId == request.auth.uid
+      );
+
+      allow create: if isBuyer() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.statusId == 'new' &&
+        request.resource.data.get('courierId', null) == null &&
+        request.resource.data.totalAmount is number &&
+        request.resource.data.totalAmount >= 0 &&
+        request.resource.data.items is list &&
+        request.resource.data.items.size() > 0 &&
+        request.resource.data.items.size() <= 100 &&
+        validOrderDiscount(request.resource.data);
+
+      allow update: if isStaff() || (
+        // Покупатель подтверждает получение (пока заказ у курьера) и скрывает
+        // из своего списка только завершенные заказы.
+        isBuyer() && resource.data.userId == request.auth.uid && (
+          (
+            changedKeys().hasOnly(['userConfirmed', 'updatedAt']) &&
+            resource.data.statusId in ['assigned', 'delivering', 'delivered']
+          ) || (
+            changedKeys().hasOnly(['hiddenByUser', 'updatedAt']) &&
+            resource.data.statusId in ['delivered', 'cancelled']
+          )
+        )
+      ) || (
+        // Курьер меняет статус только своих активных заказов.
+        isCourier() && resource.data.courierId == request.auth.uid &&
+        resource.data.statusId in ['new', 'processing', 'assigned', 'delivering'] &&
+        changedKeys().hasOnly(['statusId', 'statusName', 'courierId', 'courierName', 'courierPhone', 'updatedAt']) &&
+        request.resource.data.courierId == request.auth.uid &&
+        request.resource.data.statusId in ['delivering', 'delivered']
+      );
+
+      // Заказы физически не удаляются (финансовая отчетность).
+      allow delete: if false;
+    }
+
+    // ---------- Уведомления ----------
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && (isStaff() || resource.data.userId == request.auth.uid);
+      allow create: if (isStaff() || isCourier()) &&
+        request.resource.data.keys().hasOnly(['userId', 'text', 'textEn', 'createdAt', 'updatedAt']) &&
+        request.resource.data.userId is string &&
+        request.resource.data.text is string &&
+        request.resource.data.text.size() > 0 &&
+        request.resource.data.text.size() <= 500 &&
+        request.resource.data.get('textEn', '') is string &&
+        request.resource.data.get('textEn', '').size() <= 500;
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
+      allow update: if false;
+    }
+  }
+}
