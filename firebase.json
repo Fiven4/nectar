@@ -1,0 +1,86 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "nectar-41848",
+          "appId": "1:70969291340:android:19cdd928fc446c5931fae9",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "nectar-41848",
+          "appId": "1:70969291340:ios:9d4feb3c7863a40931fae9",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "nectar-41848",
+          "appId": "1:70969291340:ios:9d4feb3c7863a40931fae9",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nectar-41848",
+          "configurations": {
+            "android": "1:70969291340:android:19cdd928fc446c5931fae9",
+            "ios": "1:70969291340:ios:9d4feb3c7863a40931fae9",
+            "macos": "1:70969291340:ios:9d4feb3c7863a40931fae9",
+            "web": "1:70969291340:web:464aa7206ce3067331fae9",
+            "windows": "1:70969291340:web:712e450706c8921031fae9"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true,
+    "hosting": {
+      "port": 5000
+    }
+  },
+  "hosting": {
+    "public": "web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          }
+        ]
+      }
+    ]
+  }
+}
