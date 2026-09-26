@@ -1,0 +1,4 @@
+enum AuthFlowTarget {
+  mobile,
+  adminPanel,
+}
