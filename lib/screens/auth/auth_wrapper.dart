@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import '../../main_screen.dart';
 import '../../services/auth_service.dart';
@@ -7,64 +7,41 @@ import '../../services/database_service.dart';
 import '../../utils/app_palette.dart';
 import '../../utils/role_utils.dart';
 import '../courier/courier_home_screen.dart';
-import 'login_screen.dart';
+import '../../l10n/l10n.dart';
 
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: AuthService().authStateChanges,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: Color(0xFF53B175))),
-          );
-        }
-
-        final firebaseUser = snapshot.data;
-        if (firebaseUser == null) {
-          return const LoginScreen();
-        }
-
-        // Own Navigator so logout disposes every pushed route / modal with
-        // the shell. Replacing only the child of MaterialApp.home while root
-        // overlays stay alive is what triggers InheritedElement
-        // '_dependents.isEmpty'.
-        return _AuthenticatedShell(
-          key: ValueKey<String>(firebaseUser.uid),
-          user: firebaseUser,
-        );
-      },
-    );
-  }
-}
-
-class _AuthenticatedShell extends StatefulWidget {
-  const _AuthenticatedShell({super.key, required this.user});
+/// Home of a signed-in session: resolves the user's role and shows the matching
+/// app. Sign-out is handled by the app root, which replaces the whole session.
+class AuthenticatedShell extends StatefulWidget {
+  const AuthenticatedShell({super.key, required this.user});
 
   final User user;
 
   @override
-  State<_AuthenticatedShell> createState() => _AuthenticatedShellState();
+  State<AuthenticatedShell> createState() => _AuthenticatedShellState();
 }
 
-class _AuthenticatedShellState extends State<_AuthenticatedShell> {
-  late final Future<String> _roleFuture = _resolveRole(widget.user);
+class _AuthenticatedShellState extends State<AuthenticatedShell> {
+  late Future<String> _roleFuture = _resolveRole();
 
-  Future<String> _resolveRole(User currentUser) async {
+  Future<String> _resolveRole() async {
     final databaseService = DatabaseService();
-    await databaseService.ensureUserProfileFromAuth(currentUser, defaultRole: AppRoles.buyer);
-    final userProfile = await databaseService.getUserProfile(currentUser.uid);
+    var userProfile = await databaseService.getUserProfile(widget.user.uid);
 
-    final isDeleted = userProfile?['isDeleted'] == true;
-    if (isDeleted) {
+    if (userProfile?['isDeleted'] == true) {
       await AuthService().logout();
       return AppRoles.guest;
     }
 
+    if (userProfile == null) {
+      await databaseService.ensureUserProfileFromAuth(widget.user, defaultRole: AppRoles.buyer);
+      userProfile = await databaseService.getUserProfile(widget.user.uid);
+    }
+
     return userProfile?['role']?.toString() ?? AppRoles.buyer;
+  }
+
+  void _retry() {
+    setState(() => _roleFuture = _resolveRole());
   }
 
   Widget _homeForRole(String roleCode) {
@@ -81,25 +58,59 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
       future: _roleFuture,
-      builder: (context, roleSnapshot) {
-        if (roleSnapshot.connectionState == ConnectionState.waiting) {
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _ProfileLoadError(onRetry: _retry);
+        }
+
+        if (!snapshot.hasData) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator(color: AppPalette.primary)),
           );
         }
 
-        final roleCode = roleSnapshot.data ?? AppRoles.buyer;
-
-        return Navigator(
-          key: ValueKey<String>('auth-nav-${widget.user.uid}-$roleCode'),
-          onGenerateRoute: (settings) {
-            return MaterialPageRoute<void>(
-              settings: settings,
-              builder: (_) => _homeForRole(roleCode),
-            );
-          },
-        );
+        return _homeForRole(snapshot.data!);
       },
+    );
+  }
+}
+
+class _ProfileLoadError extends StatelessWidget {
+  const _ProfileLoadError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppPalette.background,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off, size: 56, color: AppPalette.textSecondary),
+              const SizedBox(height: 16),
+              Text(
+                context.l10n.profileLoadFailed,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: AppPalette.textSecondary),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppPalette.primary, foregroundColor: Colors.white),
+                onPressed: onRetry,
+                child: Text(context.l10n.retry),
+              ),
+              TextButton(
+                onPressed: () => AuthService().logout(),
+                child: Text(context.l10n.logoutFromAccount),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -126,13 +137,13 @@ class MobileRoleBlockedScreen extends StatelessWidget {
                   const Icon(Icons.lock_outline_rounded, color: AppPalette.warning, size: 56),
                   const SizedBox(height: 16),
                   Text(
-                    'Роль "$roleName" не может работать в мобильном приложении.',
+                    context.l10n.roleBlockedTitle(roleName),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Пожалуйста, используйте веб-версию (сайт) для администрирования.',
+                  Text(
+                    context.l10n.roleBlockedBody,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppPalette.textSecondary),
                   ),
@@ -141,10 +152,8 @@ class MobileRoleBlockedScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: AppPalette.primary, foregroundColor: Colors.white),
-                      onPressed: () async {
-                        await AuthService().logout();
-                      },
-                      child: const Text('Выйти из аккаунта'),
+                      onPressed: () => AuthService().logout(),
+                      child: Text(context.l10n.logoutFromAccount),
                     ),
                   ),
                 ],

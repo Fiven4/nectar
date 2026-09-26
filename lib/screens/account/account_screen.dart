@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -9,7 +9,10 @@ import '../../services/auth_service.dart';
 import '../../services/database_service.dart';
 import '../../utils/app_palette.dart';
 import '../../utils/role_utils.dart';
+import '../../widgets/app_snackbar.dart';
+import '../../widgets/language_switcher.dart';
 import 'about_screen.dart';
+import 'change_password_dialog.dart';
 import 'delivery_address_screen.dart';
 import 'help_screen.dart';
 import 'my_details_screen.dart';
@@ -17,6 +20,7 @@ import 'notifications_screen.dart';
 import 'orders_screen.dart';
 import 'payment_methods_screen.dart';
 import 'promo_code_screen.dart';
+import '../../l10n/l10n.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -41,9 +45,12 @@ class _AccountScreenState extends State<AccountScreen> {
       return;
     }
 
+    // Аватар хранится в Firestore, поэтому сжимаем его до маленького квадрата.
     final pickedFile = await _imagePicker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80,
+      maxWidth: 256,
+      maxHeight: 256,
+      imageQuality: 75,
     );
 
     if (pickedFile == null) {
@@ -51,50 +58,38 @@ class _AccountScreenState extends State<AccountScreen> {
     }
 
     final fileName = pickedFile.name.toLowerCase();
-    final isSupportedFormat = fileName.endsWith('.jpg') ||
+    final isSupportedFormat =
+        fileName.endsWith('.jpg') ||
         fileName.endsWith('.jpeg') ||
         fileName.endsWith('.png');
     if (!isSupportedFormat) {
-      _showMessage('Разрешены только изображения JPEG и PNG.', isError: true);
+      _showMessage(AppLocale.strings.avatarFormatError, isError: true);
       return;
     }
 
     final Uint8List fileBytes = await pickedFile.readAsBytes();
-    if (fileBytes.length > 5 * 1024 * 1024) {
-      _showMessage('Размер изображения не должен превышать 5 МБ.', isError: true);
+    if (!mounted) {
+      return;
+    }
+    if (fileBytes.length > DatabaseService.maxAvatarBytes) {
+      _showMessage(context.l10n.avatarTooBig, isError: true);
       return;
     }
 
     setState(() => _isUploadingAvatar = true);
     try {
-      final storageReference = FirebaseStorage.instance.ref().child(
-        'user_avatars/${currentUser.uid}.jpg',
-      );
-
-      await storageReference.putData(
-        fileBytes,
-        SettableMetadata(
-          contentType: fileName.endsWith('.png') ? 'image/png' : 'image/jpeg',
-        ),
-      );
-
-      final downloadUrl = await storageReference.getDownloadURL();
-      final userProfile = await _databaseService.getUserProfile(currentUser.uid);
-      await currentUser.updatePhotoURL(downloadUrl);
-      await _databaseService.updateUserProfile(
+      await _databaseService.saveUserAvatar(
         userId: currentUser.uid,
-        displayName: userProfile?['displayName']?.toString() ?? currentUser.displayName ?? 'Пользователь',
-        phoneNumber: userProfile?['phoneNumber']?.toString() ?? '',
-        photoUrl: downloadUrl,
+        imageBytes: fileBytes,
       );
 
       if (!mounted) {
         return;
       }
 
-      _showMessage('Аватар успешно обновлен.');
+      _showMessage(context.l10n.avatarUpdated);
     } catch (error) {
-      _showMessage('Не удалось загрузить изображение.', isError: true);
+      _showMessage(context.l10n.avatarUploadFailed, isError: true);
     } finally {
       if (mounted) {
         setState(() => _isUploadingAvatar = false);
@@ -102,12 +97,23 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  /// Аватар из профиля (base64), иначе фото Google-аккаунта.
+  ImageProvider? _avatarImage(Map<String, dynamic> profileData, User currentUser) {
+    final photoData = profileData['photoData']?.toString() ?? '';
+    if (photoData.isNotEmpty) {
+      try {
+        return MemoryImage(base64Decode(photoData));
+      } on FormatException {
+        // Поврежденные данные: показываем запасной вариант.
+      }
+    }
+    final photoUrl = profileData['photoUrl']?.toString().isNotEmpty == true
+        ? profileData['photoUrl'].toString()
+        : currentUser.photoURL;
+    return photoUrl == null ? null : NetworkImage(photoUrl);
+  }
+
   Future<void> _logout() async {
-    // Clear root overlays first (while this subtree is still mounted), then
-    // let AuthWrapper swap to LoginScreen. Logout-before-pop leaves routes
-    // depending on a deactivating InheritedElement → '_dependents.isEmpty'.
-    final rootNavigator = Navigator.of(context, rootNavigator: true);
-    rootNavigator.popUntil((route) => route.isFirst);
     await _authService.logout();
   }
 
@@ -117,27 +123,27 @@ class _AccountScreenState extends State<AccountScreen> {
       return;
     }
 
-    final shouldDelete = await showDialog<bool>(
+    final shouldDelete =
+        await showDialog<bool>(
           context: context,
-          builder: (context) {
+          builder: (dialogContext) {
             return AlertDialog(
-              title: const Text('Удалить аккаунт?'),
-              content: const Text(
-                'Аккаунт будет удален, если у вас нет незавершенных заказов. '
-                'Это действие нельзя отменить.',
+              title: Text(context.l10n.deleteAccountTitle),
+              content: Text(
+                context.l10n.deleteAccountBody,
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Отмена'),
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(context.l10n.cancel),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppPalette.danger,
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Удалить'),
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text(context.l10n.delete),
                 ),
               ],
             );
@@ -145,33 +151,34 @@ class _AccountScreenState extends State<AccountScreen> {
         ) ??
         false;
 
-    if (!shouldDelete) {
-      return;
-    }
-    if (!mounted) {
+    if (!shouldDelete || !mounted) {
       return;
     }
 
     setState(() => _isDeletingAccount = true);
-    final rootNavigator = Navigator.of(context, rootNavigator: true);
+    var profileMarkedDeleted = false;
+    Map<String, dynamic>? releasedLogin;
     try {
-      await _databaseService.assertUserCanBeDeleted(currentUser.uid);
-      rootNavigator.popUntil((route) => route.isFirst);
-      await currentUser.delete();
+      // Профиль помечаем удаленным и освобождаем логин, пока пользователь еще
+      // авторизован, и возвращаем все обратно, если Firebase не даст удалить
+      // учетную запись.
       await _databaseService.deleteUser(currentUser.uid);
+      profileMarkedDeleted = true;
+      releasedLogin = await _databaseService.releaseLoginIndex(currentUser.uid);
+      await currentUser.delete();
     } on FirebaseAuthException catch (error) {
-      if (error.code == 'requires-recent-login') {
-        _showMessage(
-          'Для удаления аккаунта нужно войти в систему заново.',
-          isError: true,
-        );
-      } else {
-        _showMessage('Не удалось удалить аккаунт.', isError: true);
-      }
+      await _restoreProfileIfNeeded(currentUser.uid, profileMarkedDeleted, releasedLogin);
+      _showMessage(
+        error.code == 'requires-recent-login'
+            ? AppLocale.strings.deleteAccountRecentLogin
+            : AppLocale.strings.deleteAccountFailed,
+        isError: true,
+      );
     } on DatabaseOperationException catch (error) {
       _showMessage(error.message, isError: true);
     } catch (_) {
-      _showMessage('Не удалось удалить аккаунт.', isError: true);
+      await _restoreProfileIfNeeded(currentUser.uid, profileMarkedDeleted, releasedLogin);
+      _showMessage(AppLocale.strings.deleteAccountFailed, isError: true);
     } finally {
       if (mounted) {
         setState(() => _isDeletingAccount = false);
@@ -179,30 +186,35 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  Future<void> _restoreProfileIfNeeded(
+    String userId,
+    bool profileMarkedDeleted,
+    Map<String, dynamic>? releasedLogin,
+  ) async {
+    if (!profileMarkedDeleted) return;
+    try {
+      await _databaseService.restoreLoginIndex(releasedLogin);
+      await _databaseService.restoreUser(userId);
+    } catch (_) {
+      // Профиль останется помеченным удаленным; при следующем входе пользователь будет разлогинен.
+    }
+  }
+
   void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppPalette.danger : AppPalette.primary,
-      ),
-    );
+    if (!mounted) return;
+    showAppSnackBar(context, message, isError: isError);
   }
 
   void _navigateTo(Widget screen) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => screen),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
   @override
   Widget build(BuildContext context) {
     final currentUser = _currentUser;
     if (currentUser == null) {
-      return const Scaffold(
-        body: Center(
-          child: Text('Пользователь не авторизован.'),
-        ),
+      return Scaffold(
+        body: Center(child: Text(context.l10n.authNotSignedIn)),
       );
     }
 
@@ -210,16 +222,15 @@ class _AccountScreenState extends State<AccountScreen> {
       stream: _databaseService.watchUserProfile(currentUser.uid),
       builder: (context, snapshot) {
         final profileData = snapshot.data ?? <String, dynamic>{};
-        final displayName = profileData['displayName']?.toString().isNotEmpty == true
+        final displayName =
+            profileData['displayName']?.toString().isNotEmpty == true
             ? profileData['displayName'].toString()
-            : (currentUser.displayName ?? 'Пользователь');
+            : (currentUser.displayName ?? context.l10n.userDefaultName);
         final email = profileData['email']?.toString().isNotEmpty == true
             ? profileData['email'].toString()
-            : (currentUser.email ?? 'Нет email');
+            : (currentUser.email ?? context.l10n.noEmail);
         final roleCode = profileData['role']?.toString() ?? AppRoles.buyer;
-        final avatarUrl = profileData['photoUrl']?.toString().isNotEmpty == true
-            ? profileData['photoUrl'].toString()
-            : currentUser.photoURL;
+        final avatarImage = _avatarImage(profileData, currentUser);
 
         return Scaffold(
           backgroundColor: AppPalette.background,
@@ -233,7 +244,9 @@ class _AccountScreenState extends State<AccountScreen> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: _isUploadingAvatar ? null : _pickAndUploadImage,
+                          onTap: _isUploadingAvatar
+                              ? null
+                              : _pickAndUploadImage,
                           child: Stack(
                             children: [
                               Container(
@@ -242,14 +255,14 @@ class _AccountScreenState extends State<AccountScreen> {
                                 decoration: BoxDecoration(
                                   color: AppPalette.lightPrimary,
                                   shape: BoxShape.circle,
-                                  image: avatarUrl == null
+                                  image: avatarImage == null
                                       ? null
                                       : DecorationImage(
-                                          image: NetworkImage(avatarUrl),
+                                          image: avatarImage,
                                           fit: BoxFit.cover,
                                         ),
                                 ),
-                                child: avatarUrl == null && !_isUploadingAvatar
+                                child: avatarImage == null && !_isUploadingAvatar
                                     ? const Icon(
                                         Icons.person,
                                         size: 36,
@@ -306,7 +319,10 @@ class _AccountScreenState extends State<AccountScreen> {
                               ),
                               const SizedBox(height: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppPalette.lightPrimary,
                                   borderRadius: BorderRadius.circular(999),
@@ -326,44 +342,70 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ),
                   const Divider(height: 1),
-                  _buildListTile(
-                    icon: Icons.shopping_bag_outlined,
-                    title: 'Заказы',
-                    onTap: () => _navigateTo(const OrdersScreen()),
-                  ),
-                  _buildListTile(
-                    icon: Icons.badge_outlined,
-                    title: 'Мои данные',
-                    onTap: () => _navigateTo(const MyDetailsScreen()),
-                  ),
-                  _buildListTile(
-                    icon: Icons.location_on_outlined,
-                    title: 'Адрес доставки',
-                    onTap: () => _navigateTo(const DeliveryAddressScreen()),
-                  ),
-                  _buildListTile(
-                    icon: Icons.payment_outlined,
-                    title: 'Способы оплаты',
-                    onTap: () => _navigateTo(const PaymentMethodsScreen()),
-                  ),
-                  _buildListTile(
-                    icon: Icons.card_giftcard_outlined,
-                    title: 'Промокоды',
-                    onTap: () => _navigateTo(const PromoCodeScreen()),
+                  if (canAccessBuyerApp(roleCode)) ...[
+                    _buildListTile(
+                      icon: Icons.shopping_bag_outlined,
+                      title: context.l10n.menuOrders,
+                      onTap: () => _navigateTo(const OrdersScreen()),
+                    ),
+                    _buildListTile(
+                      icon: Icons.badge_outlined,
+                      title: context.l10n.menuMyDetails,
+                      onTap: () => _navigateTo(const MyDetailsScreen()),
+                    ),
+                    _buildListTile(
+                      icon: Icons.location_on_outlined,
+                      title: context.l10n.menuDeliveryAddress,
+                      onTap: () => _navigateTo(const DeliveryAddressScreen()),
+                    ),
+                    _buildListTile(
+                      icon: Icons.payment_outlined,
+                      title: context.l10n.menuPaymentMethods,
+                      onTap: () => _navigateTo(const PaymentMethodsScreen()),
+                    ),
+                    _buildListTile(
+                      icon: Icons.card_giftcard_outlined,
+                      title: context.l10n.menuPromoCodes,
+                      onTap: () => _navigateTo(const PromoCodeScreen()),
+                    ),
+                  ],
+                  if (_authService.canChangePassword)
+                    _buildListTile(
+                      icon: Icons.lock_outline,
+                      title: context.l10n.menuChangePassword,
+                      onTap: () => showChangePasswordDialog(context),
+                    ),
+                  Column(
+                    children: [
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                        leading: const Icon(Icons.language, color: AppPalette.textPrimary),
+                        title: Text(
+                          context.l10n.language,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: AppPalette.textPrimary,
+                          ),
+                        ),
+                        trailing: const LanguageSwitcher(),
+                      ),
+                      const Divider(height: 1),
+                    ],
                   ),
                   _buildListTile(
                     icon: Icons.notifications_none_outlined,
-                    title: 'Уведомления',
+                    title: context.l10n.menuNotifications,
                     onTap: () => _navigateTo(const NotificationsScreen()),
                   ),
                   _buildListTile(
                     icon: Icons.help_outline,
-                    title: 'Помощь',
+                    title: context.l10n.menuHelp,
                     onTap: () => _navigateTo(const HelpScreen()),
                   ),
                   _buildListTile(
                     icon: Icons.info_outline,
-                    title: 'О приложении',
+                    title: context.l10n.menuAbout,
                     onTap: () => _navigateTo(const AboutScreen()),
                   ),
                   const SizedBox(height: 22),
@@ -381,7 +423,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             ),
                             onPressed: _logout,
                             icon: const Icon(Icons.logout),
-                            label: const Text('Выйти'),
+                            label: Text(context.l10n.logout),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -393,15 +435,19 @@ class _AccountScreenState extends State<AccountScreen> {
                               foregroundColor: AppPalette.danger,
                               side: const BorderSide(color: AppPalette.danger),
                             ),
-                            onPressed: _isDeletingAccount ? null : _deleteCurrentAccount,
+                            onPressed: _isDeletingAccount
+                                ? null
+                                : _deleteCurrentAccount,
                             icon: _isDeletingAccount
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Icon(Icons.delete_outline),
-                            label: const Text('Удалить аккаунт'),
+                            label: Text(context.l10n.deleteAccount),
                           ),
                         ),
                       ],
@@ -424,7 +470,10 @@ class _AccountScreenState extends State<AccountScreen> {
     return Column(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 4,
+          ),
           leading: Icon(icon, color: AppPalette.textPrimary),
           title: Text(
             title,

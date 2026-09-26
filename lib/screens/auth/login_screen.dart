@@ -5,8 +5,11 @@ import '../../services/auth_service.dart';
 import '../../utils/app_palette.dart';
 import '../../utils/auth_target.dart';
 import '../../utils/validators.dart';
+import '../../widgets/app_snackbar.dart';
+import '../../widgets/language_switcher.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import '../../l10n/l10n.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -38,16 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  /// Auth wrappers own the post-login UI via authStateChanges.
-  /// Only dismiss overlay routes on the root navigator (register / admin login).
-  void _afterAuthSuccess() {
-    if (!mounted) return;
-    final navigator = Navigator.of(context, rootNavigator: true);
-    if (navigator.canPop()) {
-      navigator.popUntil((route) => route.isFirst);
-    }
-  }
-
+  // Successful sign-in needs no navigation: the app root replaces this whole
+  // session once the auth state changes, disposing this screen with it.
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -57,11 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _identifierController.text,
         _passwordController.text,
       );
-      _afterAuthSuccess();
     } catch (error) {
-      if (!mounted) return;
-      _showMessage(_authService.getErrorMessage(error), isError: true);
-      setState(() => _isLoading = false);
+      _handleAuthError(error);
     }
   }
 
@@ -69,25 +61,22 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       final userCredential = await _authService.signInWithGoogle();
-      if (userCredential == null) {
-        if (mounted) setState(() => _isLoading = false);
-        return;
+      if (userCredential == null && mounted) {
+        setState(() => _isLoading = false);
       }
-      _afterAuthSuccess();
     } catch (error) {
-      if (!mounted) return;
-      _showMessage(_authService.getErrorMessage(error), isError: true);
-      setState(() => _isLoading = false);
+      _handleAuthError(error);
     }
   }
 
+  void _handleAuthError(Object error) {
+    if (!mounted) return;
+    _showMessage(_authService.getErrorMessage(error), isError: true);
+    setState(() => _isLoading = false);
+  }
+
   void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppPalette.danger : AppPalette.primary,
-      ),
-    );
+    showAppSnackBar(context, message, isError: isError);
   }
 
   @override
@@ -99,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: _isAdminFlow
           ? AppBar(
         automaticallyImplyLeading: Navigator.of(context).canPop(),
-        title: const Text('Вход в панель'),
+        title: Text(context.l10n.loginPanelAppBar),
       )
           : null,
       body: SafeArea(
@@ -115,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 24,
                       offset: const Offset(0, 14),
                     ),
@@ -126,6 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: LanguageSwitcher(),
+                      ),
+                      const SizedBox(height: 8),
                       Center(
                         child: Container(
                           width: 72,
@@ -143,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 28),
                       Text(
-                        _isAdminFlow ? 'Вход в web-панель' : 'Вход в Nectar',
+                        _isAdminFlow ? context.l10n.loginPanelTitle : context.l10n.loginTitle,
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -154,8 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 12),
                       Text(
                         _isAdminFlow
-                            ? 'Войдите под ролью администратора или менеджера.'
-                            : 'Войдите под логином или email, чтобы работать с заказами и покупками.',
+                            ? context.l10n.loginPanelSubtitle
+                            : context.l10n.loginSubtitle,
                         style: const TextStyle(
                           fontSize: 15,
                           height: 1.5,
@@ -163,35 +157,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      const Text('Логин или email'),
+                      Text(context.l10n.loginIdentifierLabel),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _identifierController,
                         textInputAction: TextInputAction.next,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Введите логин или email';
-                          }
-                          if (value.trim().length < 3 || value.trim().length > 100) {
-                            return 'Логин или email указан некорректно';
-                          }
-                          return null;
-                        },
+                        validator: Validators.validateLoginIdentifier,
                         decoration: _inputDecoration(
-                          hintText: 'Например, ivan_01 или user@mail.com',
+                          hintText: context.l10n.loginIdentifierHint,
                           icon: Icons.person_outline,
                         ),
                       ),
                       const SizedBox(height: 18),
-                      const Text('Пароль'),
+                      Text(context.l10n.labelPassword),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscureText,
-                        validator: Validators.validatePassword,
+                        validator: Validators.validatePasswordForLogin,
                         onFieldSubmitted: (_) => _submit(),
                         decoration: _inputDecoration(
-                          hintText: 'Введите пароль',
+                          hintText: context.l10n.passwordHint,
                           icon: Icons.lock_outline,
                           suffixIcon: IconButton(
                             onPressed: () => setState(() => _obscureText = !_obscureText),
@@ -211,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
                             );
                           },
-                          child: const Text('Забыли пароль?'),
+                          child: Text(context.l10n.forgotPasswordLink),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -230,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: _submit,
-                          child: Text(_isAdminFlow ? 'Войти в панель' : 'Войти'),
+                          child: Text(_isAdminFlow ? context.l10n.signInToPanel : context.l10n.signIn),
                         ),
                       ),
                       if (!_isAdminFlow) ...[
@@ -241,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _isLoading ? null : _loginWithGoogle,
                             icon: const Icon(Icons.g_mobiledata, size: 34, color: Colors.red),
-                            label: const Text('Продолжить с Google'),
+                            label: Text(context.l10n.continueWithGoogle),
                           ),
                         ),
                         const SizedBox(height: 18),
@@ -249,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: WrapAlignment.center,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            const Text('Нет аккаунта?'),
+                            Text(context.l10n.noAccount),
                             TextButton(
                               onPressed: () {
                                 Navigator.push(
@@ -257,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   MaterialPageRoute(builder: (_) => const RegisterScreen()),
                                 );
                               },
-                              child: const Text('Зарегистрироваться'),
+                              child: Text(context.l10n.registerAction),
                             ),
                           ],
                         ),
@@ -266,9 +252,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 16),
                         const Divider(),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Покупатели и курьеры работают через мобильное приложение. '
-                              'Web-панель предназначена только для ролей "Администратор" и "Менеджер".',
+                        Text(
+                          context.l10n.panelInfoNote,
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.5,

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../utils/app_palette.dart';
 import '../../utils/validators.dart';
+import '../../widgets/app_snackbar.dart';
+import '../../l10n/l10n.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -36,6 +38,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // Successful registration needs no navigation: the app root replaces this
+  // whole session once the new account is signed in.
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -50,26 +54,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         phoneNumber: _phoneController.text,
         password: _passwordController.text,
       );
-
-      if (!mounted) return;
-
-      final messenger = ScaffoldMessenger.of(context);
-      final navigator = Navigator.of(context, rootNavigator: true);
-      navigator.popUntil((route) => route.isFirst);
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Регистрация прошла успешно. Добро пожаловать!'),
-          backgroundColor: AppPalette.primary,
-        ),
-      );
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_authService.getErrorMessage(error)),
-          backgroundColor: AppPalette.danger,
-        ),
-      );
-      if (mounted) setState(() => _isLoading = false);
+      if (!mounted) return;
+      showAppSnackBar(context, _authService.getErrorMessage(error), isError: true);
+      setState(() => _isLoading = false);
     }
   }
 
@@ -78,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: AppPalette.background,
       appBar: AppBar(
-        title: const Text('Регистрация'),
+        title: Text(context.l10n.registerTitle),
       ),
       body: SafeArea(
         child: Center(
@@ -93,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 24,
                       offset: const Offset(0, 14),
                     ),
@@ -104,8 +92,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Новый аккаунт покупателя',
+                      Text(
+                        context.l10n.registerHeading,
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -114,32 +102,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'После регистрации вам автоматически будет назначена роль "Покупатель".',
+                      Text(
+                        context.l10n.registerRoleNote,
                         style: TextStyle(color: AppPalette.textSecondary, height: 1.5),
                       ),
                       const SizedBox(height: 24),
-                      _buildLabel('Логин'),
+                      _buildLabel(context.l10n.labelLogin),
                       TextFormField(
                         controller: _loginController,
                         validator: Validators.validateLogin,
                         decoration: _inputDecoration(
-                          hintText: 'Например, ivan_venikov',
+                          hintText: context.l10n.registerLoginHint,
                           icon: Icons.alternate_email,
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildLabel('Имя'),
+                      _buildLabel(context.l10n.labelName),
                       TextFormField(
                         controller: _nameController,
                         validator: Validators.validateName,
                         decoration: _inputDecoration(
-                          hintText: 'Ваше имя',
+                          hintText: context.l10n.registerNameHint,
                           icon: Icons.badge_outlined,
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildLabel('Телефон'),
+                      _buildLabel(context.l10n.labelPhone),
                       TextFormField(
                         controller: _phoneController,
                         validator: Validators.validatePhone,
@@ -150,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildLabel('Email'),
+                      _buildLabel(context.l10n.labelEmail),
                       TextFormField(
                         controller: _emailController,
                         validator: Validators.validateEmail,
@@ -161,13 +149,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildLabel('Пароль'),
+                      _buildLabel(context.l10n.labelPassword),
                       TextFormField(
                         controller: _passwordController,
                         validator: Validators.validatePassword,
                         obscureText: _obscurePassword,
                         decoration: _inputDecoration(
-                          hintText: 'Минимум 5 символов и одна цифра',
+                          hintText: context.l10n.registerPasswordHint,
                           icon: Icons.lock_outline,
                           suffixIcon: IconButton(
                             onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
@@ -178,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildLabel('Подтверждение пароля'),
+                      _buildLabel(context.l10n.labelPasswordConfirm),
                       TextFormField(
                         controller: _confirmPasswordController,
                         validator: (value) => Validators.validatePasswordConfirmation(
@@ -187,7 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         obscureText: _obscureConfirmPassword,
                         decoration: _inputDecoration(
-                          hintText: 'Повторите пароль',
+                          hintText: context.l10n.registerPasswordRepeatHint,
                           icon: Icons.lock_reset_outlined,
                           suffixIcon: IconButton(
                             onPressed: () => setState(
@@ -213,7 +201,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: _register,
-                          child: const Text('Зарегистрироваться'),
+                          child: Text(context.l10n.registerAction),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -221,7 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         alignment: Alignment.center,
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('Уже есть аккаунт? Войти'),
+                          child: Text(context.l10n.haveAccountSignIn),
                         ),
                       ),
                     ],

@@ -5,54 +5,62 @@ import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../services/database_service.dart';
 import '../../utils/app_palette.dart';
+import '../../utils/pricing.dart';
+import '../../widgets/app_snackbar.dart';
 import '../account/promo_code_screen.dart';
+import '../../l10n/l10n.dart';
 
 class CheckoutBottomSheet extends StatefulWidget {
-  const CheckoutBottomSheet({
-    super.key,
-    required this.totalAmount,
-  });
-
-  final double totalAmount;
+  const CheckoutBottomSheet({super.key});
 
   @override
   State<CheckoutBottomSheet> createState() => _CheckoutBottomSheetState();
 }
 
 class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
+  static const String _paymentOnline = 'Онлайн';
+  static const String _paymentCash = 'Наличными';
+
   final DatabaseService _databaseService = DatabaseService();
   final User? _currentUser = FirebaseAuth.instance.currentUser;
+  late final Stream<Map<String, dynamic>?>? _profileStream =
+      _currentUser == null ? null : _databaseService.watchUserProfile(_currentUser.uid);
 
   String? _selectedAddress;
-  String _selectedPaymentMethod = 'Онлайн';
+  String _selectedSlot = deliverySlots.first;
+  String _selectedPaymentMethod = _paymentOnline;
   String? _selectedCard;
   bool _isProcessing = false;
 
   Future<void> _placeOrder(CartProvider cartProvider) async {
-    if (_currentUser == null) {
-      _showMessage('Необходимо войти в систему.', isError: true);
+    final currentUser = _currentUser;
+    if (currentUser == null) {
+      _showMessage(context.l10n.checkoutSignInRequired, isError: true);
       return;
     }
 
-    if (_selectedAddress == null || _selectedAddress!.trim().isEmpty) {
-      _showMessage('Выберите адрес доставки.', isError: true);
+    final address = _selectedAddress?.trim() ?? '';
+    if (address.isEmpty) {
+      _showMessage(context.l10n.checkoutSelectAddress, isError: true);
       return;
     }
 
-    if (_selectedPaymentMethod == 'Онлайн' && (_selectedCard == null || _selectedCard!.isEmpty)) {
-      _showMessage('Для онлайн-оплаты выберите сохраненную карту.', isError: true);
+    final card = _selectedCard;
+    if (_selectedPaymentMethod == _paymentOnline && (card == null || card.isEmpty)) {
+      _showMessage(context.l10n.checkoutSelectCard, isError: true);
       return;
     }
 
     setState(() => _isProcessing = true);
     try {
       Map<String, dynamic>? promoCodeData;
-      if (cartProvider.hasPromoCode && cartProvider.appliedPromoCode != null) {
-        promoCodeData = await _databaseService.validatePromoCode(cartProvider.appliedPromoCode!);
+      final appliedPromoCode = cartProvider.appliedPromoCode;
+      if (cartProvider.hasPromoCode && appliedPromoCode != null) {
+        promoCodeData = await _databaseService.validatePromoCode(appliedPromoCode);
       }
 
       final orderData = await _databaseService.placeOrder(
-        userId: _currentUser!.uid,
+        userId: currentUser.uid,
         orderItems: cartProvider.items.values.map((cartItem) {
           return {
             'id': cartItem.id,
@@ -62,9 +70,10 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             'imageUrl': cartItem.imageUrl,
           };
         }).toList(),
-        deliveryAddress: _selectedAddress!,
+        deliveryAddress: address,
         paymentMethod: _selectedPaymentMethod,
-        paymentCard: _selectedPaymentMethod == 'Онлайн' ? _selectedCard : null,
+        paymentCard: _selectedPaymentMethod == _paymentOnline ? card : null,
+        deliverySlot: _selectedSlot,
         promoCode: promoCodeData,
       );
 
@@ -75,61 +84,21 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
       }
 
       final navigator = Navigator.of(context);
-      final orderNumber =
-          orderData['number']?.toString() ?? orderData['id'].toString();
+      final orderNumber = orderData['number']?.toString() ?? orderData['id'].toString();
 
-      // Close the sheet first, then present the dialog on the still-mounted
-      // navigator context — never reuse this State's context after pop.
+      // Закрываем шторку, а диалог показываем в контексте навигатора: контекст
+      // этого State после pop использовать нельзя.
       navigator.pop();
       await showDialog<void>(
         context: navigator.context,
         barrierDismissible: false,
-        builder: (dialogContext) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: const Icon(Icons.check_circle, color: AppPalette.primary, size: 72),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Заказ успешно оформлен!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Unbounded',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Номер заказа: $orderNumber\n'
-                  'История заказа и дальнейшие уведомления будут доступны в профиле.',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppPalette.textSecondary, height: 1.5),
-                ),
-              ],
-            ),
-            actions: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppPalette.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () => Navigator.of(dialogContext).popUntil((route) => route.isFirst),
-                  child: const Text('Вернуться в магазин'),
-                ),
-              ),
-            ],
-          );
-        },
+        builder: (dialogContext) => _OrderSuccessDialog(orderNumber: orderNumber),
       );
     } on DatabaseOperationException catch (error) {
       _showMessage(error.message, isError: true);
-    } catch (e) {
-      debugPrint('Order placement error: $e');
-      _showMessage('Не удалось оформить заказ.', isError: true);
+    } catch (error) {
+      debugPrint('Order placement error: $error');
+      _showMessage(AppLocale.strings.checkoutFailed, isError: true);
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -138,12 +107,8 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
   }
 
   void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppPalette.danger : AppPalette.primary,
-      ),
-    );
+    if (!mounted) return;
+    showAppSnackBar(context, message, isError: isError);
   }
 
   @override
@@ -165,12 +130,14 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Оформление заказа',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Unbounded',
+                Expanded(
+                  child: Text(
+                    context.l10n.checkoutTitle,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Unbounded',
+                    ),
                   ),
                 ),
                 IconButton(
@@ -181,12 +148,10 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             ),
             const SizedBox(height: 12),
             StreamBuilder<Map<String, dynamic>?>(
-              stream: _currentUser == null
-                  ? const Stream.empty()
-                  : _databaseService.watchUserProfile(_currentUser!.uid),
+              stream: _profileStream,
               builder: (context, snapshot) {
-                final addresses = List<String>.from(snapshot.data?['addresses'] ?? []);
-                final cards = List<String>.from(snapshot.data?['cards'] ?? []);
+                final addresses = List<String>.from(snapshot.data?['addresses'] ?? const []);
+                final cards = List<String>.from(snapshot.data?['cards'] ?? const []);
 
                 if (_selectedAddress == null && addresses.isNotEmpty) {
                   _selectedAddress = addresses.first;
@@ -206,42 +171,60 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                   children: [
                     const Divider(),
                     _buildDropdownRow(
-                      title: 'Адрес доставки',
+                      title: context.l10n.menuDeliveryAddress,
                       items: addresses,
                       selectedValue: _selectedAddress,
-                      emptyMessage: 'Добавьте адрес в профиле',
+                      emptyMessage: context.l10n.addAddressInProfile,
                       onChanged: (value) => setState(() => _selectedAddress = value),
                     ),
                     const Divider(),
-                    const Text(
-                      'Способ оплаты',
+                    _buildDropdownRow(
+                      title: context.l10n.deliveryTime,
+                      items: deliverySlots,
+                      selectedValue: _selectedSlot,
+                      emptyMessage: '',
+                      labelOf: (slot) => deliverySlotLabel(slot, context.l10n),
+                      onChanged: (value) {
+                        if (value != null) setState(() => _selectedSlot = value);
+                      },
+                    ),
+                    const Divider(),
+                    Text(
+                      context.l10n.paymentMethodTitle,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppPalette.textPrimary,
                       ),
                     ),
-                    RadioListTile<String>(
-                      contentPadding: EdgeInsets.zero,
-                      value: 'Онлайн',
+                    RadioGroup<String>(
                       groupValue: _selectedPaymentMethod,
-                      onChanged: (value) => setState(() => _selectedPaymentMethod = value!),
-                      title: const Text('Онлайн'),
-                    ),
-                    if (_selectedPaymentMethod == 'Онлайн')
-                      _buildDropdownRow(
-                        title: 'Карта',
-                        items: cards,
-                        selectedValue: _selectedCard,
-                        emptyMessage: 'Добавьте карту в профиле',
-                        onChanged: (value) => setState(() => _selectedCard = value),
+                      onChanged: (value) {
+                        if (value != null) setState(() => _selectedPaymentMethod = value);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RadioListTile<String>(
+                            contentPadding: EdgeInsets.zero,
+                            value: _paymentOnline,
+                            title: Text(context.l10n.paymentOnline),
+                          ),
+                          if (_selectedPaymentMethod == _paymentOnline)
+                            _buildDropdownRow(
+                              title: context.l10n.cardLabel,
+                              items: cards,
+                              selectedValue: _selectedCard,
+                              emptyMessage: context.l10n.addCardInProfile,
+                              onChanged: (value) => setState(() => _selectedCard = value),
+                            ),
+                          RadioListTile<String>(
+                            contentPadding: EdgeInsets.zero,
+                            value: _paymentCash,
+                            title: Text(context.l10n.paymentCash),
+                          ),
+                        ],
                       ),
-                    RadioListTile<String>(
-                      contentPadding: EdgeInsets.zero,
-                      value: 'Наличными',
-                      groupValue: _selectedPaymentMethod,
-                      onChanged: (value) => setState(() => _selectedPaymentMethod = value!),
-                      title: const Text('Наличными'),
                     ),
                   ],
                 );
@@ -250,11 +233,11 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             const Divider(),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Промокод'),
+              title: Text(context.l10n.promoCodeLabel),
               subtitle: Text(
                 cartProvider.hasPromoCode
                     ? '${cartProvider.appliedPromoCode} (${cartProvider.discountPercent.toStringAsFixed(0)}%)'
-                    : 'Не выбран',
+                    : context.l10n.promoNotSelected,
               ),
               trailing: TextButton(
                 onPressed: () {
@@ -263,14 +246,18 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                     MaterialPageRoute(builder: (_) => const PromoCodeScreen()),
                   );
                 },
-                child: const Text('Выбрать'),
+                child: Text(context.l10n.choose),
               ),
             ),
             const Divider(),
-            _buildSummaryRow('Сумма товаров', '₽${cartProvider.subtotalAmount.toStringAsFixed(2)}'),
-            _buildSummaryRow('Скидка', '₽${cartProvider.discountAmount.toStringAsFixed(2)}'),
+            _buildSummaryRow(context.l10n.summaryItemsTotal, '₽${cartProvider.subtotalAmount.toStringAsFixed(2)}'),
+            _buildSummaryRow(context.l10n.summaryDiscount, '−₽${cartProvider.discountAmount.toStringAsFixed(2)}'),
             _buildSummaryRow(
-              'Итого',
+              context.l10n.summaryDelivery,
+              cartProvider.deliveryAmount == 0 ? context.l10n.free : '₽${cartProvider.deliveryAmount.toStringAsFixed(2)}',
+            ),
+            _buildSummaryRow(
+              context.l10n.total,
               '₽${cartProvider.totalAmount.toStringAsFixed(2)}',
               emphasize: true,
             ),
@@ -286,7 +273,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () => _placeOrder(cartProvider),
-                      child: const Text('Разместить заказ'),
+                      child: Text(context.l10n.placeOrder),
                     ),
             ),
           ],
@@ -301,6 +288,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
     required String? selectedValue,
     required String emptyMessage,
     required ValueChanged<String?> onChanged,
+    String Function(String)? labelOf,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -332,7 +320,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                         return DropdownMenuItem<String>(
                           value: item,
                           child: Text(
-                            item,
+                            labelOf?.call(item) ?? item,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.right,
                           ),
@@ -367,6 +355,49 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _OrderSuccessDialog extends StatelessWidget {
+  const _OrderSuccessDialog({required this.orderNumber});
+
+  final String orderNumber;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: const Icon(Icons.check_circle, color: AppPalette.primary, size: 72),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            context.l10n.orderSuccessTitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Unbounded'),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            context.l10n.orderSuccessBody(orderNumber),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppPalette.textSecondary, height: 1.5),
+          ),
+        ],
+      ),
+      actions: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppPalette.primary,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+            child: Text(context.l10n.backToShop),
+          ),
+        ),
+      ],
     );
   }
 }
