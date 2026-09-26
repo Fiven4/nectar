@@ -1,0 +1,541 @@
+:root {
+  --background: #f5f3ef;
+  --surface: #ffffff;
+  --surface-alt: #f8f8fb;
+  --text: #212121;
+  --muted: #5b6070;
+  --border: #e2e5ec;
+  --nav: #636380;
+  --green: #2e7d32;
+  --green-dark: #1b5e20;
+  --green-light: #e9f7ea;
+  --orange: #b45309;
+  --danger: #c62828;
+  --shadow: 0 24px 48px rgba(18, 23, 38, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f8f6f3 0%, var(--background) 100%);
+  color: var(--text);
+  font-family: "Golos Text", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+}
+
+.screen.active {
+  display: block;
+}
+
+#login-view {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+#login-view.active {
+  display: flex;
+}
+
+.auth-card {
+  width: min(100%, 460px);
+  padding: 32px;
+  background: var(--surface);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.auth-card h1,
+.section-header h2,
+.metric-card__value,
+.modal-card h3 {
+  margin: 0;
+  font-family: "Unbounded", sans-serif;
+}
+
+.brand-badge {
+  display: inline-flex;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 12px;
+}
+
+.error-text {
+  color: var(--danger);
+  min-height: 20px;
+  margin: 16px 0 0;
+}
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.form-grid label {
+  display: grid;
+  gap: 8px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-alt);
+  padding: 14px 16px;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  border-radius: 16px;
+  padding: 12px 18px;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button {
+  background: var(--green);
+  color: #fff;
+}
+
+.ghost-button {
+  background: #eef0f5;
+  color: var(--text);
+}
+
+.danger-button {
+  background: var(--danger);
+  color: #fff;
+}
+
+.warning-button {
+  background: var(--orange);
+  color: #fff;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 24px;
+  background: var(--nav);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.topbar__brand,
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar__logo {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  font-family: "Unbounded", sans-serif;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.nav-tabs button {
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.nav-tabs button.active {
+  background: var(--green);
+  color: #fff;
+}
+
+.user-name {
+  font-weight: 700;
+}
+
+.content {
+  padding: 24px;
+}
+
+.panel-section.hidden {
+  display: none;
+}
+
+.panel-section:not(.hidden) {
+  display: block;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.section-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metrics-grid,
+.stats-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.metrics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 20px;
+}
+
+.stats-grid {
+  grid-template-columns: 2fr 1fr;
+}
+
+.metric-card,
+.chart-card,
+.table-card,
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.metric-card {
+  padding: 20px;
+}
+
+.metric-card__label {
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.metric-card__value {
+  font-size: 28px;
+}
+
+.chart-card,
+.table-card {
+  padding: 20px;
+}
+
+.chart-card h3,
+.table-card h3 {
+  margin: 0 0 16px;
+  font-family: "Unbounded", sans-serif;
+  font-size: 18px;
+}
+
+.chart-bars {
+  display: grid;
+  gap: 12px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.bar-track {
+  overflow: hidden;
+  height: 12px;
+  border-radius: 999px;
+  background: #eef0f4;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), #7ed483);
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.toolbar input {
+  max-width: 320px;
+  background: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.warning {
+  background: #fff3df;
+  color: #7a4a00;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 24, 0.42);
+  padding: 24px;
+  z-index: 20;
+}
+
+.modal-card {
+  width: min(100%, 720px);
+  padding: 24px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.modal-grid .full {
+  grid-column: 1 / -1;
+}
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  min-width: 260px;
+  max-width: 420px;
+  padding: 14px 16px;
+  background: var(--text);
+  color: #fff;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  z-index: 30;
+}
+
+.toast.success {
+  background: var(--green-dark);
+}
+
+.toast.error {
+  background: var(--danger);
+}
+
+/* Восемь вкладок не помещаются в одну строку с блоком пользователя:
+   на средних экранах меню уходит на вторую строку и переносится. */
+@media (max-width: 1500px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .nav-tabs {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 980px) {
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar__actions {
+    flex-wrap: wrap;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .content {
+    padding: 16px;
+  }
+
+  .section-header {
+    flex-direction: column;
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.language-switch {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.language-switch button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.language-switch button.active {
+  background: var(--green);
+  color: #fff;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #1b5e20;
+  outline-offset: 2px;
+}
+
+.topbar .muted {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.row-disabled td {
+  opacity: 0.55;
+}
+
+#toast-root {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+#toast-root .toast {
+  position: static;
+}
+
+/* Широкие таблицы прокручиваются внутри карточки, а не растягивают страницу. */
+.table-card {
+  overflow-x: auto;
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Nectar Admin — панель управления магазином и доставкой."
+    />
+    <title>Nectar Admin</title>
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <div id="app">
+      <section id="login-view" class="screen active">
+        <div class="auth-card">
+          <div class="brand-badge">Nectar Admin</div>
+          <h1>Панель управления магазином</h1>
+          <p class="muted">
+            Вход доступен только ролям «Администратор» и «Менеджер».
+          </p>
+          <form id="login-form" class="form-grid">
+            <label>
+              <span>Email</span>
+              <input id="login-email" type="email" required maxlength="100" autocomplete="username" placeholder="admin@company.com" />
+            </label>
+            <label>
+              <span>Пароль</span>
+              <input id="login-password" type="password" required maxlength="128" autocomplete="current-password" placeholder="Введите пароль" />
+            </label>
+            <button type="submit" class="primary-button">Войти</button>
+          </form>
+          <p id="login-error" class="error-text"></p>
+        </div>
+      </section>
+
+      <section id="admin-view" class="screen">
+        <header class="topbar">
+          <div class="topbar__brand">
+            <div class="topbar__logo">N</div>
+            <div>
+              <strong>Nectar</strong>
+              <div class="muted small">Store Control Center</div>
+            </div>
+          </div>
+          <nav id="nav-tabs" class="nav-tabs"></nav>
+          <div class="topbar__actions">
+            <div>
+              <div id="current-user-name" class="user-name"></div>
+              <div id="current-user-role" class="muted small"></div>
+            </div>
+            <button id="password-button" class="ghost-button" type="button">
+              Сменить пароль
+            </button>
+            <button id="refresh-button" class="ghost-button" type="button">
+              Обновить
+            </button>
+            <button id="logout-button" class="danger-button" type="button">
+              Выйти
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <section id="dashboard-section" class="panel-section"></section>
+          <section id="products-section" class="panel-section hidden"></section>
+          <section id="categories-section" class="panel-section hidden"></section>
+          <section id="manufacturers-section" class="panel-section hidden"></section>
+          <section id="suppliers-section" class="panel-section hidden"></section>
+          <section id="promoCodes-section" class="panel-section hidden"></section>
+          <section id="orders-section" class="panel-section hidden"></section>
+          <section id="users-section" class="panel-section hidden"></section>
+        </main>
+      </section>
+    </div>
+
+    <div id="modal-root"></div>
+    <div id="toast-root"></div>
+
+    <script type="module" src="./admin.js"></script>
+  </body>
+  </html>
