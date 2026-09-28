@@ -272,6 +272,22 @@ class DatabaseService {
     });
   }
 
+  /// Свободные заказы, которые курьер может взять: без курьера и еще не в работе.
+  /// Старые заказы идут первыми.
+  Stream<List<Map<String, dynamic>>> watchAvailableOrders() {
+    return _ordersCollection
+        .where('courierId', isNull: true)
+        .where('statusId', whereIn: const ['new', 'processing'])
+        .snapshots()
+        .map((snapshot) {
+      final orders = snapshot.docs.map(_documentToMap).toList();
+      orders.sort((leftOrder, rightOrder) {
+        return _dateTimeValue(leftOrder['createdAt']).compareTo(_dateTimeValue(rightOrder['createdAt']));
+      });
+      return orders;
+    });
+  }
+
   Stream<List<Map<String, dynamic>>> watchNotifications(String userId) {
     return _notificationsCollection.where('userId', isEqualTo: userId).snapshots().map((snapshot) {
       final notifications = snapshot.docs.map(_documentToMap).toList();
@@ -630,6 +646,71 @@ class DatabaseService {
         textEn: 'Order #$orderNumber has been delivered',
       );
     }
+  }
+
+  /// Курьер берет свободный заказ. Транзакция гарантирует, что два курьера
+  /// не возьмут один заказ: второй получит [DatabaseOperationException].
+  Future<void> claimOrder({required String orderId, required String courierId}) async {
+    final courierData = (await _usersCollection.doc(courierId).get()).data();
+    final orderReference = _ordersCollection.doc(orderId);
+
+    await _database.runTransaction((transaction) async {
+      final orderDocument = await transaction.get(orderReference);
+      final orderData = orderDocument.data();
+      if (orderData == null) {
+        throw DatabaseOperationException(AppLocale.strings.errOrderNotFound);
+      }
+
+      final isFree = orderData['courierId'] == null && const {'new', 'processing'}.contains(orderData['statusId']);
+      if (!isFree) {
+        throw DatabaseOperationException(AppLocale.strings.errOrderAlreadyTaken);
+      }
+
+      transaction.update(orderReference, {
+        'statusId': 'assigned',
+        'statusName': 'Передан курьеру',
+        'courierId': courierId,
+        'courierName': courierData?['displayName']?.toString() ?? '',
+        'courierPhone': courierData?['phoneNumber']?.toString() ?? '',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      final customerId = _stringValue(orderData['userId']);
+      if (customerId.isNotEmpty) {
+        final orderNumber = orderData['number'] ?? orderId;
+        transaction.set(_notificationsCollection.doc(), {
+          'userId': customerId,
+          'text': 'Курьер взял ваш заказ №$orderNumber',
+          'textEn': 'A courier has taken your order #$orderNumber',
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    });
+  }
+
+  /// Курьер возвращает свой заказ в пул, пока не выехал.
+  Future<void> releaseOrder({required String orderId, required String courierId}) async {
+    final orderReference = _ordersCollection.doc(orderId);
+
+    await _database.runTransaction((transaction) async {
+      final orderData = (await transaction.get(orderReference)).data();
+      if (orderData == null) {
+        throw DatabaseOperationException(AppLocale.strings.errOrderNotFound);
+      }
+      if (orderData['courierId'] != courierId || orderData['statusId'] != 'assigned') {
+        throw DatabaseOperationException(AppLocale.strings.errOrderCannotRelease);
+      }
+
+      transaction.update(orderReference, {
+        'statusId': 'processing',
+        'statusName': 'В сборке',
+        'courierId': null,
+        'courierName': null,
+        'courierPhone': null,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
   }
 
   Future<void> createNotification({

@@ -914,6 +914,18 @@ abstract class AppLocalizations {
   /// **'Для продукта необходимо выбрать категорию и производителя.'**
   String get errProductNeedsCategory;
 
+  /// No description provided for @errOrderAlreadyTaken.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот заказ уже взял другой курьер.'**
+  String get errOrderAlreadyTaken;
+
+  /// No description provided for @errOrderCannotRelease.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заказ нельзя вернуть: он уже в пути или назначен не вам.'**
+  String get errOrderCannotRelease;
+
   /// No description provided for @aboutVersion.
   ///
   /// In ru, this message translates to:
@@ -1567,6 +1579,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Состав заказа'**
   String get courierItemsTitle;
+
+  /// No description provided for @courierTabMine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои заказы'**
+  String get courierTabMine;
+
+  /// No description provided for @courierTabAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свободные'**
+  String get courierTabAvailable;
+
+  /// No description provided for @courierNoAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свободных заказов нет. Новые заказы появятся здесь сами.'**
+  String get courierNoAvailable;
+
+  /// No description provided for @courierClaim.
+  ///
+  /// In ru, this message translates to:
+  /// **'Взять заказ'**
+  String get courierClaim;
+
+  /// No description provided for @courierClaimed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заказ взят в работу'**
+  String get courierClaimed;
+
+  /// No description provided for @courierRelease.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть в пул'**
+  String get courierRelease;
+
+  /// No description provided for @courierReleaseTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть заказ?'**
+  String get courierReleaseTitle;
+
+  /// No description provided for @courierReleaseBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заказ {number} снова станет доступен другим курьерам.'**
+  String courierReleaseBody(String number);
+
+  /// No description provided for @courierReleased.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заказ возвращен в пул'**
+  String get courierReleased;
 
   /// No description provided for @detailsSaved.
   ///

@@ -61,4 +61,6 @@ STRINGS = {
     "errProductPricePositive": ("Цена продукта должна быть больше 0.", "The product price must be greater than 0."),
     "errProductStockRange": ("Количество на складе должно быть в диапазоне 0-9999.", "The stock quantity must be between 0 and 9999."),
     "errProductNeedsCategory": ("Для продукта необходимо выбрать категорию и производителя.", "Choose a category and a manufacturer for the product."),
+    "errOrderAlreadyTaken": ("Этот заказ уже взял другой курьер.", "This order has already been taken by another courier."),
+    "errOrderCannotRelease": ("Заказ нельзя вернуть: он уже в пути или назначен не вам.", "The order cannot be returned: it is on the way or assigned to someone else."),
 }

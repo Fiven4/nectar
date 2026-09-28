@@ -85,6 +85,16 @@ service cloud.firestore {
                 == data.get('discountPercent', 0));
     }
 
+    // Свободный заказ: без курьера и еще не в работе у другого.
+    function isFreeOrder() {
+      return resource.data.get('courierId', null) == null
+        && resource.data.statusId in ['new', 'processing'];
+    }
+
+    function courierClaimKeys() {
+      return ['statusId', 'statusName', 'courierId', 'courierName', 'courierPhone', 'updatedAt'];
+    }
+
     // ---------- Пользователи ----------
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || isStaff());
@@ -181,7 +191,9 @@ service cloud.firestore {
       allow read: if signedIn() && (
         isStaff() ||
         resource.data.userId == request.auth.uid ||
-        resource.data.courierId == request.auth.uid
+        resource.data.get('courierId', null) == request.auth.uid ||
+        // Курьеры видят пул свободных заказов, которые можно взять.
+        (isCourier() && isFreeOrder())
       );
 
       allow create: if isBuyer() &&
@@ -211,9 +223,22 @@ service cloud.firestore {
         // Курьер меняет статус только своих активных заказов.
         isCourier() && resource.data.courierId == request.auth.uid &&
         resource.data.statusId in ['new', 'processing', 'assigned', 'delivering'] &&
-        changedKeys().hasOnly(['statusId', 'statusName', 'courierId', 'courierName', 'courierPhone', 'updatedAt']) &&
+        changedKeys().hasOnly(courierClaimKeys()) &&
         request.resource.data.courierId == request.auth.uid &&
         request.resource.data.statusId in ['delivering', 'delivered']
+      ) || (
+        // Курьер сам берет свободный заказ: он становится исполнителем, статус «передан курьеру».
+        isCourier() && isFreeOrder() &&
+        changedKeys().hasOnly(courierClaimKeys()) &&
+        request.resource.data.courierId == request.auth.uid &&
+        request.resource.data.statusId == 'assigned'
+      ) || (
+        // Курьер может вернуть свой заказ в пул, пока не выехал.
+        isCourier() && resource.data.get('courierId', null) == request.auth.uid &&
+        resource.data.statusId == 'assigned' &&
+        changedKeys().hasOnly(courierClaimKeys()) &&
+        request.resource.data.get('courierId', null) == null &&
+        request.resource.data.statusId == 'processing'
       );
 
       // Заказы физически не удаляются (финансовая отчетность).

@@ -347,6 +347,98 @@ void main() {
     });
   });
 
+  group('курьер берет заказы сам', () {
+    Future<void> seedOrders(FakeFirebaseFirestore store) async {
+      await store.collection('users').doc('courier1').set({'displayName': 'Иван Курьер', 'phoneNumber': '+7 900 111-22-33', 'role': 'courier'});
+      await store.collection('users').doc('courier2').set({'displayName': 'Второй', 'phoneNumber': '+7 900 000-00-00', 'role': 'courier'});
+      await store.collection('orders').doc('free-new').set({
+        'userId': _buyerId, 'number': 'ORD-1', 'statusId': 'new', 'statusName': 'Новый', 'courierId': null,
+        'createdAt': Timestamp.fromDate(DateTime(2026, 9, 2)),
+      });
+      await store.collection('orders').doc('free-processing').set({
+        'userId': _buyerId, 'number': 'ORD-2', 'statusId': 'processing', 'statusName': 'В сборке', 'courierId': null,
+        'createdAt': Timestamp.fromDate(DateTime(2026, 9, 1)),
+      });
+      await store.collection('orders').doc('taken').set({
+        'userId': _buyerId, 'number': 'ORD-3', 'statusId': 'assigned', 'statusName': 'Передан курьеру', 'courierId': 'courier2',
+      });
+      await store.collection('orders').doc('cancelled').set({
+        'userId': _buyerId, 'number': 'ORD-4', 'statusId': 'cancelled', 'statusName': 'Отменен', 'courierId': null,
+      });
+    }
+
+    test('пул содержит только свободные заказы, старые первыми', () async {
+      final store = await _seededStore();
+      await seedOrders(store);
+
+      final pool = await _service(store, actor: 'courier1').watchAvailableOrders().first;
+      expect(pool.map((order) => order['id']), ['free-processing', 'free-new']);
+    });
+
+    test('взятый заказ закрепляется за курьером, покупатель получает уведомление', () async {
+      final store = await _seededStore();
+      await seedOrders(store);
+      final service = _service(store, actor: 'courier1');
+
+      await service.claimOrder(orderId: 'free-new', courierId: 'courier1');
+
+      final order = (await store.collection('orders').doc('free-new').get()).data()!;
+      expect(order['courierId'], 'courier1');
+      expect(order['courierName'], 'Иван Курьер');
+      expect(order['courierPhone'], '+7 900 111-22-33');
+      expect(order['statusId'], 'assigned');
+
+      final notifications = await store.collection('notifications').get();
+      expect(notifications.docs.single.data()['userId'], _buyerId);
+      expect(notifications.docs.single.data()['textEn'], contains('ORD-1'));
+
+      final pool = await service.watchAvailableOrders().first;
+      expect(pool.map((item) => item['id']), ['free-processing']);
+    });
+
+    test('второй курьер не может взять уже взятый, чужой или отмененный заказ', () async {
+      final store = await _seededStore();
+      await seedOrders(store);
+      final service = _service(store, actor: 'courier2');
+
+      await _service(store, actor: 'courier1').claimOrder(orderId: 'free-new', courierId: 'courier1');
+      for (final id in ['free-new', 'taken', 'cancelled']) {
+        await expectLater(
+          service.claimOrder(orderId: id, courierId: 'courier2'),
+          throwsA(isA<DatabaseOperationException>()),
+          reason: id,
+        );
+      }
+      await expectLater(service.claimOrder(orderId: 'missing', courierId: 'courier2'), throwsA(isA<DatabaseOperationException>()));
+      expect((await store.collection('orders').doc('free-new').get()).data()!['courierId'], 'courier1');
+    });
+
+    test('заказ можно вернуть в пул только до выезда и только свой', () async {
+      final store = await _seededStore();
+      await seedOrders(store);
+      final service = _service(store, actor: 'courier1');
+      await service.claimOrder(orderId: 'free-new', courierId: 'courier1');
+
+      await expectLater(
+        _service(store, actor: 'courier2').releaseOrder(orderId: 'free-new', courierId: 'courier2'),
+        throwsA(isA<DatabaseOperationException>()),
+      );
+
+      await service.releaseOrder(orderId: 'free-new', courierId: 'courier1');
+      final released = (await store.collection('orders').doc('free-new').get()).data()!;
+      expect(released['courierId'], isNull);
+      expect(released['statusId'], 'processing');
+      expect((await service.watchAvailableOrders().first).map((order) => order['id']), contains('free-new'));
+
+      await service.claimOrder(orderId: 'free-new', courierId: 'courier1');
+      await service.updateOrder(orderId: 'free-new', statusId: 'delivering', courierId: 'courier1');
+      await expectLater(
+        service.releaseOrder(orderId: 'free-new', courierId: 'courier1'),
+        throwsA(isA<DatabaseOperationException>()),
+      );
+    });
+  });
+
   group('адреса и карты', () {
     test('адрес: пустой и слишком длинный отклоняются, дубликат не добавляется', () async {
       final store = await _seededStore();

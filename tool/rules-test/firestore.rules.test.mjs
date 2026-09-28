@@ -1,6 +1,7 @@
 // Тесты правил безопасности на локальном эмуляторе (боевой проект не затрагивается).
 // Запуск: cd tool/rules-test && npm install && npm test
 import { readFileSync } from "node:fs";
+import assert from "node:assert/strict";
 import { after, before, beforeEach, describe, it } from "node:test";
 import {
   assertFails,
@@ -46,6 +47,7 @@ const seedUsers = {
   buyer1: { role: "buyer" },
   buyer2: { role: "buyer" },
   courier1: { role: "courier" },
+  courier2: { role: "courier" },
   blocked1: { role: "buyer", isDeleted: true, deletedBy: "admin1" },
   selfDeleted1: { role: "buyer", isDeleted: true, deletedBy: "selfDeleted1" },
 };
@@ -70,6 +72,7 @@ beforeEach(async () => {
     await setDoc(doc(db, "loginIndex", "buyer1login"), { uid: "buyer1", email: emailOf("buyer1") });
     const base = { totalAmount: 100, userId: "buyer1", items: [] };
     await setDoc(doc(db, "orders", "new1"), { ...base, statusId: "new", courierId: null });
+    await setDoc(doc(db, "orders", "processing1"), { ...base, statusId: "processing", courierId: null });
     await setDoc(doc(db, "orders", "assigned1"), { ...base, statusId: "assigned", courierId: "courier1" });
     await setDoc(doc(db, "orders", "delivering1"), { ...base, statusId: "delivering", courierId: "courier1" });
     await setDoc(doc(db, "orders", "delivered1"), { ...base, statusId: "delivered", courierId: "courier1" });
@@ -266,7 +269,8 @@ describe("orders", () => {
     await assertSucceeds(getDoc(doc(as("buyer1"), "orders", "assigned1")));
     await assertFails(getDoc(doc(as("buyer1"), "orders", "other1")));
     await assertSucceeds(getDoc(doc(as("courier1"), "orders", "assigned1")));
-    await assertFails(getDoc(doc(as("courier1"), "orders", "new1")));
+    await assertSucceeds(getDoc(doc(as("courier1"), "orders", "new1"))); // свободный заказ виден курьерам
+    await assertFails(getDoc(doc(as("courier1"), "orders", "other1")));
     await assertSucceeds(getDoc(doc(as("mgr1"), "orders", "other1")));
     await assertSucceeds(getDocs(query(collection(as("buyer1"), "orders"), where("userId", "==", "buyer1"))));
     await assertSucceeds(getDocs(query(collection(as("courier1"), "orders"), where("courierId", "==", "courier1"))));
@@ -299,6 +303,65 @@ describe("orders", () => {
     await assertFails(updateDoc(doc(as("courier1"), "orders", "assigned1"), { statusId: "delivering", courierId: "buyer1" }));
     await assertFails(updateDoc(doc(as("courier1"), "orders", "assigned1"), { statusId: "cancelled" }));
     await assertFails(updateDoc(doc(as("courier1"), "orders", "assigned1"), { totalAmount: 1 }));
+  });
+
+  describe("курьер сам берет заказы", () => {
+    const claim = (uid = "courier1") => ({
+      statusId: "assigned",
+      statusName: "Передан курьеру",
+      courierId: uid,
+      courierName: "Курьер",
+      courierPhone: "+7 900 000-00-00",
+      updatedAt: serverTimestamp(),
+    });
+    const release = () => ({
+      statusId: "processing",
+      statusName: "В сборке",
+      courierId: null,
+      courierName: null,
+      courierPhone: null,
+      updatedAt: serverTimestamp(),
+    });
+
+    it("пул свободных заказов виден курьерам, но не покупателям", async () => {
+      const pool = query(collection(as("courier1"), "orders"), where("courierId", "==", null), where("statusId", "in", ["new", "processing"]));
+      const snapshot = await assertSucceeds(getDocs(pool));
+      assert.deepEqual(snapshot.docs.map((d) => d.id).sort(), ["new1", "processing1"]);
+      await assertFails(getDocs(query(collection(as("buyer2"), "orders"), where("courierId", "==", null))));
+      await assertFails(getDoc(doc(as("courier1"), "orders", "other1")));
+    });
+
+    it("курьер берет свободный заказ и становится его исполнителем", async () => {
+      await assertSucceeds(updateDoc(doc(as("courier1"), "orders", "new1"), claim()));
+      await assertSucceeds(updateDoc(doc(as("courier2"), "orders", "processing1"), claim("courier2")));
+    });
+
+    it("нельзя взять занятый, чужой, завершенный заказ или назначить другого курьера", async () => {
+      await assertFails(updateDoc(doc(as("courier2"), "orders", "assigned1"), claim("courier2")));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "delivered1"), claim()));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "cancelled1"), claim()));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "other1"), claim()));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "new1"), claim("courier2")));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "new1"), { ...claim(), statusId: "delivered" }));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "new1"), { ...claim(), totalAmount: 1 }));
+    });
+
+    it("покупатель и гость не берут заказы", async () => {
+      await assertFails(updateDoc(doc(as("buyer1"), "orders", "new1"), claim("buyer1")));
+      await assertFails(updateDoc(doc(guest(), "orders", "new1"), claim("x")));
+    });
+
+    it("второй курьер не может перехватить уже взятый заказ", async () => {
+      await assertSucceeds(updateDoc(doc(as("courier1"), "orders", "new1"), claim()));
+      await assertFails(updateDoc(doc(as("courier2"), "orders", "new1"), claim("courier2")));
+    });
+
+    it("курьер возвращает свой заказ в пул только до выезда", async () => {
+      await assertSucceeds(updateDoc(doc(as("courier1"), "orders", "assigned1"), release()));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "delivering1"), release()));
+      await assertFails(updateDoc(doc(as("courier2"), "orders", "assigned1"), release()));
+      await assertFails(updateDoc(doc(as("courier1"), "orders", "assigned1"), { ...release(), statusId: "new" }));
+    });
   });
 
   it("персонал меняет заказы, удалять их нельзя никому", async () => {

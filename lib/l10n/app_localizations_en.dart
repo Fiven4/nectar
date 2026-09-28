@@ -452,6 +452,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose a category and a manufacturer for the product.';
 
   @override
+  String get errOrderAlreadyTaken =>
+      'This order has already been taken by another courier.';
+
+  @override
+  String get errOrderCannotRelease =>
+      'The order cannot be returned: it is on the way or assigned to someone else.';
+
+  @override
   String get aboutVersion => 'Version 1.0.0';
 
   @override
@@ -810,6 +818,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courierItemsTitle => 'Items';
+
+  @override
+  String get courierTabMine => 'My orders';
+
+  @override
+  String get courierTabAvailable => 'Available';
+
+  @override
+  String get courierNoAvailable =>
+      'No free orders. New orders will appear here automatically.';
+
+  @override
+  String get courierClaim => 'Take order';
+
+  @override
+  String get courierClaimed => 'Order taken';
+
+  @override
+  String get courierRelease => 'Return to pool';
+
+  @override
+  String get courierReleaseTitle => 'Return the order?';
+
+  @override
+  String courierReleaseBody(String number) {
+    return 'Order $number will become available to other couriers again.';
+  }
+
+  @override
+  String get courierReleased => 'Order returned to the pool';
 
   @override
   String get detailsSaved => 'Your details have been saved';

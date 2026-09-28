@@ -456,6 +456,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Для продукта необходимо выбрать категорию и производителя.';
 
   @override
+  String get errOrderAlreadyTaken => 'Этот заказ уже взял другой курьер.';
+
+  @override
+  String get errOrderCannotRelease =>
+      'Заказ нельзя вернуть: он уже в пути или назначен не вам.';
+
+  @override
   String get aboutVersion => 'Версия 1.0.0';
 
   @override
@@ -814,6 +821,36 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get courierItemsTitle => 'Состав заказа';
+
+  @override
+  String get courierTabMine => 'Мои заказы';
+
+  @override
+  String get courierTabAvailable => 'Свободные';
+
+  @override
+  String get courierNoAvailable =>
+      'Свободных заказов нет. Новые заказы появятся здесь сами.';
+
+  @override
+  String get courierClaim => 'Взять заказ';
+
+  @override
+  String get courierClaimed => 'Заказ взят в работу';
+
+  @override
+  String get courierRelease => 'Вернуть в пул';
+
+  @override
+  String get courierReleaseTitle => 'Вернуть заказ?';
+
+  @override
+  String courierReleaseBody(String number) {
+    return 'Заказ $number снова станет доступен другим курьерам.';
+  }
+
+  @override
+  String get courierReleased => 'Заказ возвращен в пул';
 
   @override
   String get detailsSaved => 'Данные успешно сохранены';

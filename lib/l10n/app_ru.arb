@@ -326,6 +326,10 @@
   "@errProductStockRange": {},
   "errProductNeedsCategory": "Для продукта необходимо выбрать категорию и производителя.",
   "@errProductNeedsCategory": {},
+  "errOrderAlreadyTaken": "Этот заказ уже взял другой курьер.",
+  "@errOrderAlreadyTaken": {},
+  "errOrderCannotRelease": "Заказ нельзя вернуть: он уже в пути или назначен не вам.",
+  "@errOrderCannotRelease": {},
   "aboutVersion": "Версия 1.0.0",
   "@aboutVersion": {},
   "aboutTerms": "Условия использования",
@@ -607,6 +611,30 @@
   "@courierPhoneCopied": {},
   "courierItemsTitle": "Состав заказа",
   "@courierItemsTitle": {},
+  "courierTabMine": "Мои заказы",
+  "@courierTabMine": {},
+  "courierTabAvailable": "Свободные",
+  "@courierTabAvailable": {},
+  "courierNoAvailable": "Свободных заказов нет. Новые заказы появятся здесь сами.",
+  "@courierNoAvailable": {},
+  "courierClaim": "Взять заказ",
+  "@courierClaim": {},
+  "courierClaimed": "Заказ взят в работу",
+  "@courierClaimed": {},
+  "courierRelease": "Вернуть в пул",
+  "@courierRelease": {},
+  "courierReleaseTitle": "Вернуть заказ?",
+  "@courierReleaseTitle": {},
+  "courierReleaseBody": "Заказ {number} снова станет доступен другим курьерам.",
+  "@courierReleaseBody": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "courierReleased": "Заказ возвращен в пул",
+  "@courierReleased": {},
   "detailsSaved": "Данные успешно сохранены",
   "@detailsSaved": {},
   "detailsSaveFailed": "Не удалось сохранить данные. Попробуйте еще раз.",

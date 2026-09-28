@@ -21,4 +21,13 @@ STRINGS = {
     'courierTotal': ('Сумма заказа: {amount}', 'Order total: {amount}'),
     'courierPhoneCopied': ('Телефон скопирован', 'Phone number copied'),
     'courierItemsTitle': ('Состав заказа', 'Items'),
+    'courierTabMine': ('Мои заказы', 'My orders'),
+    'courierTabAvailable': ('Свободные', 'Available'),
+    'courierNoAvailable': ('Свободных заказов нет. Новые заказы появятся здесь сами.', 'No free orders. New orders will appear here automatically.'),
+    'courierClaim': ('Взять заказ', 'Take order'),
+    'courierClaimed': ('Заказ взят в работу', 'Order taken'),
+    'courierRelease': ('Вернуть в пул', 'Return to pool'),
+    'courierReleaseTitle': ('Вернуть заказ?', 'Return the order?'),
+    'courierReleaseBody': ('Заказ {number} снова станет доступен другим курьерам.', 'Order {number} will become available to other couriers again.'),
+    'courierReleased': ('Заказ возвращен в пул', 'Order returned to the pool'),
 }
