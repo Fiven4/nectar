@@ -7,7 +7,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.9-0175C2?logo=dart&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore%20%7C%20Hosting-FFCA28?logo=firebase&logoColor=black)
-![Tests](https://img.shields.io/badge/tests-125%20passing-2E7D32)
+![Tests](https://img.shields.io/badge/tests-137%20passing-2E7D32)
 ![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS%20%7C%20Web-lightgrey)
 
 Курсовой проект (МДК 01.01): информационная система интернет-магазина продуктов.
@@ -36,7 +36,7 @@
 | Роль | Где работает | Что умеет |
 | --- | --- | --- |
 | 🛒 **Покупатель** | мобильное приложение | каталог с поиском, фильтрами и сортировкой, избранное, корзина с контролем остатков, промокоды, оформление заказа (адрес, время, оплата картой или наличными), отслеживание статуса, уведомления, профиль с аватаром, смена пароля, RU/EN |
-| 🚚 **Курьер** | мобильное приложение | активные и завершённые заказы, адрес, состав, телефон клиента (копируется по нажатию), сумма к получению наличными, «Начать доставку» → «Подтвердить доставку» с подтверждением, уведомления о новых назначениях |
+| 🚚 **Курьер** | мобильное приложение | вкладка **«Свободные»**: пул неназначенных заказов, «Взять заказ» (два курьера не возьмут один: транзакция), «Вернуть в пул» до выезда; вкладка **«Мои заказы»**: активные и история, адрес, состав, телефон клиента (копируется), сумма к получению наличными, «Начать доставку» → «Подтвердить доставку» с подтверждением; уведомления о назначениях |
 | 🧑‍💼 **Менеджер** | веб-панель | дашборд, товары, категории, производители, промокоды, заказы (смена статуса, назначение курьера), просмотр поставщиков и пользователей |
 | 👑 **Администратор** | веб-панель | всё, что у менеджера, плюс поставщики, роли и блокировка пользователей, восстановление скрытого |
 
@@ -70,8 +70,10 @@
 
 <table>
   <tr>
-    <td align="center"><img src="docs/screenshots/app-courier.png" width="240" alt="Заказы курьера"><br><sub>Активные заказы и история</sub></td>
-    <td align="center"><img src="docs/screenshots/app-courier-confirm.png" width="240" alt="Подтверждение доставки"><br><sub>Подтверждение доставки</sub></td>
+    <td align="center"><img src="docs/screenshots/app-courier-pool.png" width="200" alt="Свободные заказы"><br><sub>Свободные заказы</sub></td>
+    <td align="center"><img src="docs/screenshots/app-courier.png" width="200" alt="Заказы курьера"><br><sub>Мои заказы и история</sub></td>
+    <td align="center"><img src="docs/screenshots/app-courier-confirm.png" width="200" alt="Подтверждение доставки"><br><sub>Подтверждение доставки</sub></td>
+    <td align="center"><img src="docs/screenshots/app-notifications.png" width="200" alt="Уведомления"><br><sub>Уведомления и переключатели</sub></td>
   </tr>
 </table>
 
@@ -168,11 +170,11 @@ docs/screenshots/ изображения для README
 
 ## Безопасность
 
-Правила лежат в [`firestore.rules`](firestore.rules) и проверяются 32 тестами. Кратко:
+Правила лежат в [`firestore.rules`](firestore.rules) и проверяются 38 тестами. Кратко:
 
 - покупатель видит только свой профиль и заказы; может лишь уменьшать остаток товара (не больше 99 за запись) и увеличивать счётчик промокода при оформлении;
 - скидка в заказе обязана совпадать с промокодом, на который он ссылается;
-- курьер видит и двигает статус только назначенных ему **активных** заказов;
+- курьер видит и двигает статус только своих **активных** заказов, а также видит пул свободных (без курьера, `new`/`processing`), может взять заказ (`courierId` = он сам, статус `assigned`) и вернуть его в пул до выезда;
 - роли и блокировку меняет только администратор; заблокированный не может снять блокировку, а самоудаление можно откатить;
 - запись в `loginIndex` возможна только для своей почты из токена;
 - заказы не удаляются (финансовая отчётность);
@@ -201,7 +203,7 @@ firebase emulators:start --only auth,firestore --project nectar-41848
 
 # 2. Демо-данные: каталог из lib/data, пользователи, заказы
 cd tool/rules-test && npm install
-SEED_DEMO=1 node seed-emulator.mjs          # catalog.json обновляется: dart run tool/dump_catalog.dart > tool/rules-test/catalog.json
+SEED_DEMO=1 node seed-emulator.mjs          # SEED_MINIMAL=1 — только админ и каталог, остальных создаёте через приложение; catalog.json обновляется: dart run tool/dump_catalog.dart > tool/rules-test/catalog.json
 
 # 3. Веб-панель: http://localhost:8090/?emulator=1
 python3 -m http.server 8090 -d ../../web
@@ -218,15 +220,15 @@ flutter run --dart-define=FIREBASE_EMULATOR=localhost      # Android-эмуля�
 
 ```bash
 flutter analyze
-flutter test                        # 72 теста
-cd tool/rules-test && npm test      # 21 unit-тест веб-панели + 32 теста правил
+flutter test                        # 78 тестов
+cd tool/rules-test && npm test      # 21 unit-тест веб-панели + 38 тестов правил
 ```
 
 | Что проверяется | Где |
 | --- | --- |
-| валидаторы, корзина, расчёт доставки, модели | `test/*.dart` |
+| валидаторы, корзина, расчёт доставки, модели, тема переключателей | `test/*.dart` |
 | `DatabaseService`: заказ, остатки, промокоды, логины, аватар (fake Firestore) | `test/database_service_test.dart` |
-| логика курьера: группировка, допустимые переходы | `test/courier_orders_test.dart` |
+| логика курьера: группировка, переходы; взятие и возврат заказа в транзакции | `test/courier_orders_test.dart`, `test/database_service_test.dart` |
 | локализация: одинаковые ключи, нет «сырых» `\n`, безопасные аргументы | `test/localization_test.dart`, `arb_text_test.dart`, `l10n_args_test.dart` |
 | сессия: выход с открытым диалогом и роутом | `test/session_app_test.dart` |
 | правила Firestore на эмуляторе (роли, заказы, промокоды, логины) | `tool/rules-test/firestore.rules.test.mjs` |
@@ -248,7 +250,7 @@ firebase deploy --only hosting              # веб-панель (папка we
 
 - Цены и итог заказа считает клиент; правила проверяют владельца, статус и скидку, но не пересчитывают сумму. Полная защита требует Cloud Functions (платный тариф Blaze).
 - Переключатели push/SMS/email в профиле сохраняют настройку, но рассылка не реализована.
-- У курьера нет карты и маршрута, отказа от заказа и самостоятельного взятия заказов из общей очереди.
+- У курьера нет карты и построения маршрута.
 - `lib/screens/web/` — заглушка админки на Flutter Web; рабочая админка — JS-панель в `web/`.
 - iOS-сборка не проверялась (нужна платформа iOS в Xcode), проверено на Android-эмуляторе и в браузере.
 
