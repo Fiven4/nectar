@@ -25,7 +25,11 @@ async function createAuthUser(email) {
 const demo = process.env.SEED_DEMO === "1";
 const catalog = demo ? JSON.parse(readFileSync(new URL("./catalog.json", import.meta.url), "utf8")) : null;
 
-const people = [
+// SEED_MINIMAL=1 (вместе с SEED_DEMO=1): только администратор, каталог и промокод —
+// остальных пользователей и заказы создают вручную через приложение и панель.
+const minimal = process.env.SEED_MINIMAL === "1";
+
+const allPeople = [
   { key: "admin", email: "admin@nectar.test", role: "admin", displayName: "Админ Админов" },
   { key: "manager", email: "manager@nectar.test", role: "manager", displayName: "Мария Менеджер" },
   { key: "courier", email: "courier@nectar.test", role: "courier", displayName: "Кирилл Курьер", phoneNumber: "+7 900 111-22-33" },
@@ -35,6 +39,8 @@ const people = [
   { key: "blocked", email: "blocked@nectar.test", role: "buyer", displayName: "Заблокированный", isDeleted: true, deletedBy: "admin" },
   { key: "outsider", email: "outsider@nectar.test", role: "buyer", displayName: "Посторонний", isDeleted: false },
 ];
+const people = minimal ? allPeople.filter((person) => person.key === "admin") : allPeople;
+
 
 const env = await initializeTestEnvironment({
   projectId: process.env.EMULATOR_PROJECT || "nectar-41848",
@@ -108,11 +114,13 @@ await env.withSecurityRulesDisabled(async (context) => {
       address: "Москва, Тверская 1, кв. 12", paymentMethod: "Наличными", deliverySlot: "Как можно скорее (до 60 минут)", customerPhone: "+7 900 123-45-67",
       ...extra,
     });
+  if (!minimal) {
   await order("new1", "buyer", "new");
   await order("assigned1", "xss", "assigned", { courierId: ids.courier, courierName: "Кирилл Курьер" });
   await order("delivered1", "buyer", "delivered", { courierId: ids.courier, courierName: "Кирилл Курьер", totalAmount: 100 });
   await order("cancelled1", "buyer", "cancelled", { totalAmount: 999 });
   await setDoc(doc(db, "notifications", "n1"), { userId: ids.buyer, text: "Привет", createdAt: now });
+  }
 });
 
 await env.cleanup();
