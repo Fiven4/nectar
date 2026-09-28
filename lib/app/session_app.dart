@@ -73,6 +73,10 @@ ThemeData _buildTheme() {
       trackColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.selected) ? AppPalette.primary : Colors.grey.shade300,
       ),
+      // Включенный переключатель: зеленая дорожка и белый «бегунок» без обводки.
+      trackOutlineColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? Colors.transparent : Colors.grey.shade500,
+      ),
     ),
   );
 }

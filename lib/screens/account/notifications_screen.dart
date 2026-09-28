@@ -60,7 +60,6 @@ class NotificationsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 children: [
                   SwitchListTile(
-                    activeThumbColor: AppPalette.primary,
                     contentPadding: EdgeInsets.zero,
                     title: Text(context.l10n.notifPushTitle),
                     subtitle: Text(context.l10n.notifPushSubtitle),
@@ -76,7 +75,6 @@ class NotificationsScreen extends StatelessWidget {
                   ),
                   const Divider(),
                   SwitchListTile(
-                    activeThumbColor: AppPalette.primary,
                     contentPadding: EdgeInsets.zero,
                     title: Text(context.l10n.notifSmsTitle),
                     subtitle: Text(context.l10n.notifSmsSubtitle),
@@ -92,7 +90,6 @@ class NotificationsScreen extends StatelessWidget {
                   ),
                   const Divider(),
                   SwitchListTile(
-                    activeThumbColor: AppPalette.primary,
                     contentPadding: EdgeInsets.zero,
                     title: Text(context.l10n.notifEmailTitle),
                     subtitle: Text(context.l10n.notifEmailSubtitle),
