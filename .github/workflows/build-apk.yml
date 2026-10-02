@@ -5,6 +5,9 @@ on:
   push:
     tags: ['v*']
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -20,7 +23,14 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build apk --release
+      - run: cp build/app/outputs/flutter-apk/app-release.apk nectar.apk
       - uses: actions/upload-artifact@v4
         with:
           name: nectar-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: nectar.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: Нектар (APK)
+          files: nectar.apk
+          target_commitish: ${{ github.sha }}
